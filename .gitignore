@@ -1,0 +1,16 @@
+# CMake Out-of-Source Build
+**/_builds
+**/bin
+
+# System Files
+**/.DS_Store
+
+# Other Files
+**/*.pdf
+
+# CLion files
+.idea/
+
+# Cmake & Binaries
+cmake-build-debug/
+build/
