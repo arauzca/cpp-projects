@@ -160,7 +160,7 @@ int main( void )
     glBindVertexArray(VertexArrayID);
 
     // Create and compile our GLSL program from the shaders
-    GLuint programID = LoadShaders( "../glsl/SimpleVertexShader.vert", "../glsl/SimpleFragmentShader.frag" );
+    GLuint programID = LoadShaders( "./glsl/SimpleVertexShader.vert", "./glsl/SimpleFragmentShader.frag" );
     GLuint MatrixID  = glGetUniformLocation(programID, "MVP");
 
 

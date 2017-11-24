@@ -1,9 +1,11 @@
 # Define library. Only source files here!
-project(CommonLibraries VERSION 0.1 LANGUAGES CXX)
+project(CommonLibraries VERSION 0.1)
 
 file( GLOB SRCS
-        ./src/*.cpp
-        ./src/*.c)
+        ./src/util/*.cpp
+        ./src/util/*.c
+        ./src/SOIL2/*.cpp
+        ./src/SOIL2/*.c)
 
 add_library(libcommon SHARED
         ${SRCS})
@@ -56,7 +58,7 @@ target_link_libraries (libcommon
 # paths.
 target_include_directories(libcommon PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
-        $<INSTALL_INTERFACE:inc>
+        $<INSTALL_INTERFACE:include>
         PRIVATE src)
 
 # If we have compiler requirements for this library, list them
@@ -66,4 +68,7 @@ set_property(TARGET libcommon PROPERTY CXX_STANDARD 17)
 #        PUBLIC cxx_auto_type
 #        PRIVATE cxx_variadic_templates)
 
-install(DIRECTORY inc/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# for cmake_install.cmake:
+#   DIRECTORY   the content (directories and files) of this directory will copied to the destination directory
+#   DESTINATION if defined relative the full path will be ${CMAKE_INSTALL_PREFIX}/[DESTINATION]
+install(DIRECTORY inc/ DESTINATION include/)

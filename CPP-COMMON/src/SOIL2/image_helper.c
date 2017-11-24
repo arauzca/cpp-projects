@@ -6,7 +6,7 @@
     MIT license
 */
 
-#include "image_helper.h"
+#include "SOIL2/image_helper.h"
 #include <stdlib.h>
 #include <math.h>
 

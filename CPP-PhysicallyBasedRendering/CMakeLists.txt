@@ -10,7 +10,7 @@ set( EXECUTABLE_NAME ${PROJECT_NAME} )
 set( CMAKE_VERBOSE_MAKEFILE TRUE )
 set( CMAKE_COLOR_MAKEFILE TRUE )
 set( CMAKE_SUPPRESS_REGENERATION TRUE )
-set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin" )
+set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" )
 set( CMAKE_MODULE_PATH "${CMAKE_HOME_DIRECTORY}/_CMAKE;/usr/local/lib/cmake" )
 set( CMAKE_PREFIX_PATH /usr/local/lib/cmake/glfw3 )
 
@@ -82,14 +82,12 @@ source_group( "src" FILES ${SRCS} )
 
 # find headers (let them show up in the IDEs)
 file( GLOB HDRS
-        ../_COMMON/inc/*.h
-        ../_COMMON/inc/*.hpp
-        ../CPP-COMMON/inc/*.h
-        ../CPP-COMMON/inc/*.hpp
+        ../CPP-COMMON/inc/util/*.h
+        ../CPP-COMMON/inc/util/*.hpp
+        ../CPP-COMMON/inc/SOIL2/*.h
+        ../CPP-COMMON/inc/SOIL2/*.hpp
         ./inc/*.h
         ./inc/*.hpp
-        ./src/SOIL2/*.h
-        ./src/SOIL2/*.hpp
         )
 source_group( "inc" FILES ${HDRS} )
 

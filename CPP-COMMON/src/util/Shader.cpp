@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../inc/Shader.h"
+#include "util/Shader.h"
 
 
 Shader::Shader( const GLchar * vertex_file_path, const GLchar * fragment_file_path )

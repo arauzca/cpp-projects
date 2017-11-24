@@ -41,7 +41,7 @@
 
 
 // application includes ///////////////////////////////////////////////////////////////////////////
-#include "../inc/TrackBall.h"
+#include "util/TrackBall.h"
 
 
 // init static class members //////////////////////////////////////////////////////////////////////
@@ -374,6 +374,8 @@ void TrackBall::glutMouseMotionCB(int x, int y)
 			_Translation[2] += dy / 40.0f;
 			break;
 		}
+        default:
+            break;
 	}
 
 	glutPostRedisplay();

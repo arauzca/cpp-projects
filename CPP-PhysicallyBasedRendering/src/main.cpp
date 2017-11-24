@@ -14,13 +14,10 @@
 
 GLFWwindow* window;
 
-#include "Shader.h"
-#include "Camera.h"
 
-
-#include "SOIL2/SOIL2.h"
-
-#include "Texture.h"
+#include "util/Shader.h"
+#include "util/Camera.h"
+#include "util/Texture.h"
 
 using namespace std;
 

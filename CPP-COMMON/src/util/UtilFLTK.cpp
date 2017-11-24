@@ -21,7 +21,7 @@ using namespace std;
 #include <FL/glut.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/fl_ask.H>
-#include "../inc/UtilFLTK.h"
+#include "util/UtilFLTK.h"
 
 
 

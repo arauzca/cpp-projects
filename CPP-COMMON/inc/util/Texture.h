@@ -6,6 +6,9 @@
 
 #include <vector>
 
+// SOIL2 include
+#include "SOIL2/SOIL2.h"
+
 class TextureLoading
 {
 public:

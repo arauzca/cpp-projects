@@ -10,7 +10,7 @@ set( EXECUTABLE_NAME ${PROJECT_NAME} )
 set( CMAKE_VERBOSE_MAKEFILE TRUE )
 set( CMAKE_COLOR_MAKEFILE TRUE )
 set( CMAKE_SUPPRESS_REGENERATION TRUE )
-set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin" )
+set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" )
 set( CMAKE_MODULE_PATH "${CMAKE_HOME_DIRECTORY}/_CMAKE;/usr/local/lib/cmake" )
 set( CMAKE_PREFIX_PATH /usr/local/lib/cmake/glfw3 )
 
@@ -135,6 +135,11 @@ add_definitions( -DGLM_FORCE_RADIANS )
 set( EXECUTABLE_NAME ${PROJECT_NAME} )
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HDRS} ${GLSL})
 set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 17)
+
+# copy resources directory
+add_custom_command( TARGET ${EXECUTABLE_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:P2_GLM>)
 
 # add framework (specific to mac)
 target_link_libraries (${EXECUTABLE_NAME}
