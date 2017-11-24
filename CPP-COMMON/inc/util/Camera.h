@@ -31,22 +31,14 @@ class Camera
 {
 public:
     // Constructor with vectors
-    Camera( glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3 up = glm::vec3( 0.0f, 1.0f, 0.0f ), GLfloat yaw = YAW, GLfloat pitch = PITCH ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM )
+    explicit Camera( glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3 up = glm::vec3( 0.0f, 1.0f, 0.0f ), GLfloat yaw = YAW, GLfloat pitch = PITCH ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM ), position( position ), worldUp( up ), yaw( yaw ), pitch( pitch )
     {
-        this->position = position;
-        this->worldUp = up;
-        this->yaw = yaw;
-        this->pitch = pitch;
         this->updateCameraVectors( );
     }
     
     // Constructor with scalar values
-    Camera( GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM )
+    Camera( GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM ), position( glm::vec3( posX, posY, posZ ) ), worldUp( glm::vec3( upX, upY, upZ ) ), yaw( yaw ), pitch( pitch )
     {
-        this->position = glm::vec3( posX, posY, posZ );
-        this->worldUp = glm::vec3( upX, upY, upZ );
-        this->yaw = yaw;
-        this->pitch = pitch;
         this->updateCameraVectors( );
     }
     
@@ -83,7 +75,7 @@ public:
     }
     
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void ProcessMouseMovement( GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true )
+    void ProcessMouseMovement( GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = static_cast<GLboolean>( true ) )
     {
         xOffset *= this->mouseSensitivity;
         yOffset *= this->mouseSensitivity;

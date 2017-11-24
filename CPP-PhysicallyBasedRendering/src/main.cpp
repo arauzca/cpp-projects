@@ -1,6 +1,7 @@
 //
 // Created by Carlos Arauz on 22.11.17.
 //
+// TODO: Mesh.h and Model.h from: https://github.com/SonarSystems/Modern-OpenGL-Tutorials/tree/master/%5BADVANCED%20OPENGL%5D/%5B17%5D%20Cubemap:Skybox
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -194,7 +195,7 @@ int main()
     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
     glBufferData( GL_ARRAY_BUFFER, sizeof( cubeVertices ), &cubeVertices, GL_STATIC_DRAW );
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), nullptr );
     glEnableVertexAttribArray( 1 );
     glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
     glBindVertexArray(0);
@@ -208,12 +209,12 @@ int main()
     glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
     glBufferData( GL_ARRAY_BUFFER, sizeof( skyboxVertices ), &skyboxVertices, GL_STATIC_DRAW );
     glEnableVertexAttribArray( 0 );
-    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), nullptr );
     glBindVertexArray(0);
 
 
     // Load textures
-    GLuint cubeTexture = TextureLoading::LoadTexture( "images/container2.png" );
+    GLuint cubeTexture = TextureLoading::LoadTexture( const_cast<GLchar *>("images/container2.png") );
 
     // Cubemap (Skybox)
     /**
@@ -235,7 +236,7 @@ int main()
     while( !glfwWindowShouldClose( window ) )
     {
         // Set frame time
-        GLfloat currentFrame = glfwGetTime( );
+        auto currentFrame = static_cast<GLfloat>( glfwGetTime( ) );
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 

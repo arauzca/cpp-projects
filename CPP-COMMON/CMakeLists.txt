@@ -18,6 +18,7 @@ find_package (glfw3 REQUIRED NO_MODULE)
 find_package (FLTK REQUIRED)
 find_package (GLM REQUIRED)
 find_package (GLEW REQUIRED STATIC)
+find_package (ASSIMP REQUIRED)
 
 
 # find framework (specific to mac)
