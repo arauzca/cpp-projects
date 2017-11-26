@@ -1,7 +1,6 @@
 //
 // Created by Carlos Arauz on 22.11.17.
 //
-// TODO: Mesh.h and Model.h from: https://github.com/SonarSystems/Modern-OpenGL-Tutorials/tree/master/%5BADVANCED%20OPENGL%5D/%5B17%5D%20Cubemap:Skybox
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -19,6 +18,7 @@ GLFWwindow* window;
 #include "util/Shader.h"
 #include "util/Camera.h"
 #include "util/Texture.h"
+#include <util/Mesh.h>
 
 using namespace std;
 
@@ -33,7 +33,7 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
 
 // Camera
-Camera camera( glm::vec3( 0.0f, 0.0f, 3.0f ) );
+Camera camera (glm::vec3( 0.0f, 0.0f, 3.0f ));
 bool keys[1024];
 GLfloat lastX = 400, lastY = 300;
 bool firstMouse = true;
@@ -94,60 +94,59 @@ int main()
     Shader skyboxShader( "shaders/skybox.vert", "shaders/skybox.frag" );
 
 
-    GLfloat cubeVertices[] =
-            {
-                    // Positions          // Texture Coords
-                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-                    0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    float cubeVertices[] = {
+            // positions          // normals
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-                    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-                    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-                    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-                    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
 
-                    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                    0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-                    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                    0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-                    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-                    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-                    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-                    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-                    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-            };
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    };
 
 
     GLfloat skyboxVertices[] = {
             // Positions
             -1.0f,  1.0f, -1.0f,
             -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
             -1.0f,  1.0f, -1.0f,
 
             -1.0f, -1.0f,  1.0f,
@@ -157,48 +156,47 @@ int main()
             -1.0f,  1.0f,  1.0f,
             -1.0f, -1.0f,  1.0f,
 
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
 
             -1.0f, -1.0f,  1.0f,
             -1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f, -1.0f,  1.0f,
             -1.0f, -1.0f,  1.0f,
 
             -1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
             -1.0f,  1.0f,  1.0f,
             -1.0f,  1.0f, -1.0f,
 
             -1.0f, -1.0f, -1.0f,
             -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
             -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f
+             1.0f, -1.0f,  1.0f
     };
 
 
-    // Setup cube VAO
-    GLuint cubeVAO, cubeVBO;
-    glGenVertexArrays( 1, &cubeVAO );
-    glGenBuffers( 1, &cubeVBO );
-    glBindVertexArray( cubeVAO );
-    glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( cubeVertices ), &cubeVertices, GL_STATIC_DRAW );
+    // cube VAO
+    unsigned int cubeVAO, cubeVBO;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), nullptr );
-    glEnableVertexAttribArray( 1 );
-    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
-    glBindVertexArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);                                        // offset: (void *)(0 * sizeof(float)) = (void *)0 = nullptr
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
 
     // Setup skybox VAO
@@ -218,19 +216,18 @@ int main()
 
     // Cubemap (Skybox)
     /**
-     * FACES in this order: FRONT, BACK, TOP, BOTTOM, RIGHT, LEFT
+     * FACES in this order: RIGHT, LEFT, TOP, BOTTOM, BACK, FRONT
      */
     vector<const GLchar*> faces;
-    faces.push_back( "images/mp_bleak/bleak-outlook_ft.tga" );
-    faces.push_back( "images/mp_bleak/bleak-outlook_bk.tga" );
-    faces.push_back( "images/mp_bleak/bleak-outlook_up.tga" );
-    faces.push_back( "images/mp_bleak/bleak-outlook_dn.tga" );
-    faces.push_back( "images/mp_bleak/bleak-outlook_rt.tga" );
-    faces.push_back( "images/mp_bleak/bleak-outlook_lf.tga" );
+    faces.push_back( "images/skybox_hd/right.jpg" );
+    faces.push_back( "images/skybox_hd/left.jpg" );
+    faces.push_back( "images/skybox_hd/top.jpg" );
+    faces.push_back( "images/skybox_hd/bottom.jpg" );
+    faces.push_back( "images/skybox_hd/back.jpg" );
+    faces.push_back( "images/skybox_hd/front.jpg" );
     GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
 
-    glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 1000.0f );
-
+    shader.setInt( "texture1", 0 );
 
     // Game loop
     while( !glfwWindowShouldClose( window ) )
@@ -249,33 +246,24 @@ int main()
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
-        glm::mat4 model;
-        glm::mat4 view = camera.GetViewMatrix();
-
 
         // Draw our first triangle
         shader.use( );
+        glm::mat4 model;
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
 
-        // Bind Textures using texture units
-        glActiveTexture( GL_TEXTURE0 );
-        glBindTexture( GL_TEXTURE_2D, cubeTexture );
-        glUniform1i( glGetUniformLocation( shader.getProgram(), "texture1" ), 0 );
-
-        // Get the uniform locations
-        GLint modelLoc = glGetUniformLocation( shader.getProgram(), "model" );
-        GLint viewLoc = glGetUniformLocation( shader.getProgram(), "view" );
-        GLint projLoc = glGetUniformLocation( shader.getProgram(), "projection" );
-
-        // Pass the matrices to the shader
-        glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
-        glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
+        shader.setMatrix( "model",      model );
+        shader.setMatrix( "view",       view );
+        shader.setMatrix( "projection", projection );
+        shader.setMatrix( "cameraPos",  camera.GetPosition( ) );
 
         glBindVertexArray( cubeVAO );
-
-        // Calculate the model matrix for each object and pass it to shader before drawing
-        glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
+        glActiveTexture( GL_TEXTURE0 );
+        glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTexture );
         glDrawArrays( GL_TRIANGLES, 0, 36 );
         glBindVertexArray( 0 );
+
 
 
         // Draw skybox as last
@@ -283,8 +271,8 @@ int main()
         skyboxShader.use( );
         view = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );	// Remove any translation component of the view matrix
 
-        glUniformMatrix4fv( glGetUniformLocation( skyboxShader.getProgram(), "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
-        glUniformMatrix4fv( glGetUniformLocation( skyboxShader.getProgram(), "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+        skyboxShader.setMatrix( "view",       view );
+        skyboxShader.setMatrix( "projection", projection );
 
         // skybox cube
         glBindVertexArray( skyboxVAO );

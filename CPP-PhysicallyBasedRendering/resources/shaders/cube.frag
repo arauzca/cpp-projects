@@ -1,8 +1,11 @@
 #version 330 core
-in vec3 ourColor;
-in vec2 TexCoord;
+out vec4 FragColor;
 
-out vec4 color;
+in  vec3 Normal;
+in  vec3 Position;
+
+uniform vec3 cameraPos;
+uniform samplerCube skybox;
 
 // Texture samplers
 uniform sampler2D texture1;
@@ -10,5 +13,7 @@ uniform sampler2D texture1;
 void main()
 {
     // Linearly interpolate between both textures (second texture is only slightly combined)
-    color = texture(texture1, TexCoord);
+    vec3 I = normalize(Position - cameraPos);
+    vec3 R = reflect(I, normalize(Normal));
+    FragColor = vec4(texture(skybox,R).rgb, 1.0);
 }

@@ -6,14 +6,17 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "util/Shader.h"
 
 
-Shader::Shader( const GLchar * vertex_file_path, const GLchar * fragment_file_path )
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Shader::Shader( const GLchar * vertex_file_path, const GLchar * fragment_file_path ) : Program(_Program)
+////////////////////////////////////////////////////////////////////////////////////////////////////
 {
-    // retreive shaders ///////////////////////////////////////////////////////////////////////////
+    // retreive shaders ////////////////////////////////////////////////////////////////////////////
     std::ios_base::iostate  exceptionMask;
     std::string             vertShaderCode;
     std::string             fragShaderCode;
@@ -53,7 +56,7 @@ Shader::Shader( const GLchar * vertex_file_path, const GLchar * fragment_file_pa
     const GLchar *vertSourcePointer = vertShaderCode.c_str( );
     const GLchar *fragSourcePointer = fragShaderCode.c_str( );
 
-    // compile shaders ////////////////////////////////////////////////////////////////////////////
+    // compile shaders /////////////////////////////////////////////////////////////////////////////
     GLuint vertShaderID;
     GLuint fragShaderID;
     GLint  success;
@@ -87,39 +90,77 @@ Shader::Shader( const GLchar * vertex_file_path, const GLchar * fragment_file_pa
         std::cout << &fragShaderErrorMessage[0] << std::endl;
     }
 
-    // shader program /////////////////////////////////////////////////////////////////////////////
-    this->Program = glCreateProgram( );
-    glAttachShader( this->Program, vertShaderID );
-    glAttachShader( this->Program, fragShaderID );
-    glLinkProgram( this->Program );
+    // shader program //////////////////////////////////////////////////////////////////////////////
+    this->_Program = glCreateProgram( );
+    glAttachShader( this->_Program, vertShaderID );
+    glAttachShader( this->_Program, fragShaderID );
+    glLinkProgram( this->_Program );
 
-    glGetProgramiv( this->Program, GL_LINK_STATUS, &success );
+    glGetProgramiv( this->_Program, GL_LINK_STATUS, &success );
     if( !success )
     {
-        glGetProgramiv( this->Program, GL_INFO_LOG_LENGTH, &infoLogLength );
+        glGetProgramiv( this->_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
         std::vector<char> programmLinkErrorMessage(static_cast<unsigned long>(infoLogLength + 1) );
-        glGetProgramInfoLog( this->Program, infoLogLength, nullptr, &programmLinkErrorMessage[0] );
+        glGetProgramInfoLog( this->_Program, infoLogLength, nullptr, &programmLinkErrorMessage[0] );
         std::cout << &programmLinkErrorMessage[0] << std::endl;
     }
 
-    // delete shaders: shaders are already linked into the program ////////////////////////////////
+    // delete shaders: shaders are already linked into the program /////////////////////////////////
     glDeleteShader( vertShaderID );
     glDeleteShader( fragShaderID );
 }
-// Shader(const GLchar *, const GLchar *) /////////////////////////////////////////////////////////
+// Shader(const GLchar *, const GLchar *) //////////////////////////////////////////////////////////
 
-
-GLuint Shader::getProgram( )
-///////////////////////////////////////////////////////////////////////////////////////////////////
-{
-    return this->Program;
-}
-// Shader::getProgram( ) //////////////////////////////////////////////////////////////////////////
 
 
 void Shader::use( )
-///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 {
-    glUseProgram( this->Program );
+    glUseProgram( this->_Program );
 }
-// Shader::user( ) ////////////////////////////////////////////////////////////////////////////////
+// Shader::user( ) /////////////////////////////////////////////////////////////////////////////////
+
+
+
+void Shader::setBool( const std::string &name, GLboolean value ) const
+////////////////////////////////////////////////////////////////////////////////////////////////////
+{
+    glUniform1i( glGetUniformLocation( _Program, name.c_str() ), static_cast<GLint>( value ) );
+}
+// Shader::setBool( const std::string &, GLboolean ) const /////////////////////////////////////////
+
+
+
+void Shader::setInt( const std::string &name, GLint value ) const
+////////////////////////////////////////////////////////////////////////////////////////////////////
+{
+    glUniform1i( glGetUniformLocation( _Program, name.c_str() ), value );
+}
+// Shader::setInt( const std::string &, GLint ) const //////////////////////////////////////////////
+
+
+
+void Shader::setFloat( const std::string &name, GLfloat value ) const
+////////////////////////////////////////////////////////////////////////////////////////////////////
+{
+    glUniform1f(glGetUniformLocation(_Program, name.c_str()), value);
+}
+// Shader::setFloat( const std::string &, GLfloat ) const //////////////////////////////////////////
+
+
+
+void Shader::setMatrix( const std::string &name, const glm::vec3 &matrix ) const
+////////////////////////////////////////////////////////////////////////////////////////////////////
+{
+    glUniformMatrix3fv( glGetUniformLocation( _Program, name.c_str( ) ), 1, GL_FALSE, glm::value_ptr( matrix ) );
+}
+// Shader::setMatrix4fv(const std::string &, const glm::mat4 &) const //////////////////////////////
+
+
+
+void Shader::setMatrix( const std::string &name, const glm::mat4 &matrix ) const
+////////////////////////////////////////////////////////////////////////////////////////////////////
+{
+    glUniformMatrix4fv( glGetUniformLocation( _Program, name.c_str( ) ), 1, GL_FALSE, glm::value_ptr( matrix ) );
+}
+// Shader::setMatrix4fv(const std::string &, const glm::mat4 &) const //////////////////////////////

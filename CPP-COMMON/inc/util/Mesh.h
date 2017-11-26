@@ -4,13 +4,17 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "util/Shader.h"
+#include <util/Shader.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 using namespace std;
 
@@ -41,12 +45,8 @@ public:
     
     /*  Functions  */
     // Constructor
-    Mesh( vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures )
+    explicit Mesh( vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures ) : vertices( std::move( vertices ) ), indices( std::move( indices ) ), textures( std::move( textures ) )
     {
-        this->vertices = vertices;
-        this->indices = indices;
-        this->textures = textures;
-        
         // Now that we have all the required data, set the vertex buffers and its attribute pointers.
         this->setupMesh( );
     }
@@ -77,17 +77,17 @@ public:
             
             number = ss.str( );
             // Now set the sampler to the correct texture unit
-            glUniform1i( glGetUniformLocation( shader.getProgram(), ( name + number ).c_str( ) ), i );
+            glUniform1i( glGetUniformLocation( shader.Program, ( name + number ).c_str( ) ), i );
             // And finally bind the texture
             glBindTexture( GL_TEXTURE_2D, this->textures[i].id );
         }
         
         // Also set each mesh's shininess property to a default value (if you want you could extend this to another mesh property and possibly change this value)
-        glUniform1f( glGetUniformLocation( shader.getProgram(), "material.shininess" ), 16.0f );
+        glUniform1f( glGetUniformLocation( shader.Program, "material.shininess" ), 16.0f );
         
         // Draw mesh
         glBindVertexArray( this->VAO );
-        glDrawElements( GL_TRIANGLES, this->indices.size( ), GL_UNSIGNED_INT, 0 );
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>( this->indices.size( ) ), GL_UNSIGNED_INT, nullptr );
         glBindVertexArray( 0 );
         
         // Always good practice to set everything back to defaults once configured.
@@ -100,7 +100,7 @@ public:
     
 private:
     /*  Render data  */
-    GLuint VAO, VBO, EBO;
+    GLuint VAO = 0, VBO = 0, EBO = 0;
     
     /*  Functions    */
     // Initializes all the buffer objects/arrays
@@ -125,7 +125,7 @@ private:
         // Set the vertex attribute pointers
         // Vertex Positions
         glEnableVertexAttribArray( 0 );
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( GLvoid * )0 );
+        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), nullptr );
         // Vertex Normals
         glEnableVertexAttribArray( 1 );
         glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( GLvoid * )offsetof( Vertex, Normal ) );
