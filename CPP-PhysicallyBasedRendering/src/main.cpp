@@ -1,42 +1,58 @@
 //
 // Created by Carlos Arauz on 22.11.17.
 //
-#include <iostream>
+
+
+// include GLEW
 #include <GL/glew.h>
+
+
+// include GLFW
 #include <GLFW/glfw3.h>
 
-// GLM Mathemtics
+
+// include GLM mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <vector>
 
-GLFWwindow* window;
-
-
-#include "util/Shader.h"
-#include "util/Camera.h"
-#include "util/Texture.h"
+// include utility libraries
+#include <util/Shader.h>
+#include <util/Camera.h>
+#include <util/Texture.h>
 #include <util/Mesh.h>
 
-using namespace std;
 
+// system includes
+#include <iostream>
+#include <vector>
 
-// Properties
-const GLuint WIDTH = 800, HEIGHT = 600;
-int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Function prototypes
+void framebuffer_size_callback( GLFWwindow * window, int width, int height );
+void mouse_callback( GLFWwindow * window, double xpos, double ypos );
+void scroll_callback( GLFWwindow * window, double xoffset, double yoffset );
+void processInput( GLFWwindow * window );
+
 void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
 void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
+void renderSphere( );
+
+
+// Properties
+const GLuint SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
+
 
 // Camera
 Camera camera (glm::vec3( 0.0f, 0.0f, 3.0f ));
-bool keys[1024];
-GLfloat lastX = 400, lastY = 300;
+GLfloat lastX = 800.0f / 2.0f;
+GLfloat lastY = 600.0f / 2.0f;
+
+
 bool firstMouse = true;
+bool keys[1024];
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
@@ -48,12 +64,15 @@ int main()
     // Set all the required options for GLFW
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
     glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+    glfwWindowHint( GLFW_SAMPLES, 4 );
     glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+
+#ifdef __APPLE__
     glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-    glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
+#endif
 
     // Create a GLFWwindow object that we can use for GLFW's functions
-    GLFWwindow *window = glfwCreateWindow( WIDTH, HEIGHT, "Physically Based Rendering", nullptr, nullptr );
+    GLFWwindow *window = glfwCreateWindow( SCREEN_WIDTH, SCREEN_HEIGHT, "Physically Based Rendering", nullptr, nullptr );
 
     if ( nullptr == window )
     {
@@ -64,15 +83,17 @@ int main()
     }
 
     glfwMakeContextCurrent( window );
+    glfwSetFramebufferSizeCallback( window, framebuffer_size_callback );
+    glfwSetCursorPosCallback( window, mouse_callback );
+    glfwSetScrollCallback( window, scroll_callback );
 
-    glfwGetFramebufferSize( window, &SCREEN_WIDTH, &SCREEN_HEIGHT );
-
-    // Set the required callback functions
-    glfwSetKeyCallback( window, KeyCallback );
-    glfwSetCursorPosCallback( window, MouseCallback );
 
     // GLFW Options
     glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+
+    // Set the required callback functions
+    glfwSetKeyCallback( window, KeyCallback );
+
 
     // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
     glewExperimental = GL_TRUE;
@@ -83,62 +104,20 @@ int main()
         return EXIT_FAILURE;
     }
 
-    // Define the viewport dimensions
-    glViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
 
     // OpenGL options
     glEnable( GL_DEPTH_TEST );
 
     // Setup and compile our shaders
-    Shader shader( "shaders/cube.vert", "shaders/cube.frag" );
+    Shader shader( "shaders/sphere.vert", "shaders/sphere.frag" );
     Shader skyboxShader( "shaders/skybox.vert", "shaders/skybox.frag" );
 
-
-    float cubeVertices[] = {
-            // positions          // normals
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
-
+    shader.use( );
+    shader.setInt( "albedoMap", 0 );
+    shader.setInt( "normalMap", 1 );
+    shader.setInt( "metallicMap", 2 );
+    shader.setInt( "roughnessMap", 3 );
+    shader.setInt( "aoMap", 4 );
 
     GLfloat skyboxVertices[] = {
             // Positions
@@ -186,19 +165,6 @@ int main()
     };
 
 
-    // cube VAO
-    unsigned int cubeVAO, cubeVBO;
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &cubeVBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);                                        // offset: (void *)(0 * sizeof(float)) = (void *)0 = nullptr
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
-
-
     // Setup skybox VAO
     GLuint skyboxVAO, skyboxVBO;
     glGenVertexArrays( 1, &skyboxVAO );
@@ -210,9 +176,6 @@ int main()
     glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), nullptr );
     glBindVertexArray(0);
 
-
-    // Load textures
-    GLuint cubeTexture = TextureLoading::LoadTexture( const_cast<GLchar *>("images/container2.png") );
 
     // Cubemap (Skybox)
     /**
@@ -248,22 +211,9 @@ int main()
 
 
         // Draw our first triangle
-        shader.use( );
         glm::mat4 model;
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
-
-        shader.setMatrix( "model",      model );
-        shader.setMatrix( "view",       view );
-        shader.setMatrix( "projection", projection );
-        shader.setMatrix( "cameraPos",  camera.GetPosition( ) );
-
-        glBindVertexArray( cubeVAO );
-        glActiveTexture( GL_TEXTURE0 );
-        glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTexture );
-        glDrawArrays( GL_TRIANGLES, 0, 36 );
-        glBindVertexArray( 0 );
-
 
 
         // Draw skybox as last
@@ -290,6 +240,45 @@ int main()
     glfwTerminate( );
 
     return EXIT_SUCCESS;
+}
+
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback( GLFWwindow * window, int width, int height )
+{
+    // make sure the viewport match the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport( 0, 0, width, height );
+}
+
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback( GLFWwindow * window, double xpos, double ypos )
+{
+    if ( firstMouse )
+    {
+        lastX      = xpos;
+        lastY      = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;  // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement( xoffset, yoffset );
+}
+
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback( GLFWwindow * window, double xoffset, double yoffset )
+{
+    camera.ProcessMouseScroll( yoffset );
 }
 
 
@@ -357,4 +346,110 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos )
     lastY = yPos;
 
     camera.ProcessMouseMovement( xOffset, yOffset );
+}
+
+// renders (and builds at first invocation) a sphere
+// -------------------------------------------------
+GLuint  sphereVAO = 0;
+GLsizei indexCount;
+void renderSphere( )
+{
+    if ( sphereVAO == 0 )
+    {
+        glGenVertexArrays( 1, &sphereVAO );
+
+        GLuint VBO, EBO;
+        glGenBuffers( 1, &VBO );
+        glGenBuffers( 1, &EBO );
+
+        std::vector<glm::vec3>  positions;
+        std::vector<glm::vec2>  uv;
+        std::vector<glm::vec3>  normals;
+        std::vector<GLuint>     indices;
+
+        const GLuint    X_SEGMENTS = 64;
+        const GLuint    Y_SEGMENTS = 64;
+        const GLfloat   PI = 3.14159265359f;
+
+        for ( GLuint y = 0; y <= Y_SEGMENTS; ++y )
+        {
+            for ( GLuint x = 0; x <= X_SEGMENTS; ++x )
+            {
+                GLfloat xSegment = static_cast<GLfloat>( x ) / static_cast<GLfloat>( X_SEGMENTS );
+                GLfloat ySegment = static_cast<GLfloat>( y ) / static_cast<GLfloat>( Y_SEGMENTS );
+                GLfloat xPos     = std::cos( xSegment * 2.0f * PI ) * std::sin( ySegment * PI );
+                GLfloat yPos     = std::cos( ySegment * PI );
+                GLfloat zPos     = std::sin( xSegment * 2.0f * PI ) * std::sin( ySegment * PI );
+
+                positions.emplace_back(xPos, yPos, zPos);
+                uv.emplace_back( xSegment, ySegment );
+                normals.emplace_back( xPos, yPos, zPos );
+            }
+        }
+
+        bool oddRow = false;
+        for ( GLint y = 0; y < Y_SEGMENTS; ++y )
+        {
+            if ( !oddRow )
+            {
+                for ( GLint x = 0; x <= X_SEGMENTS; ++x )
+                {
+                    indices.emplace_back(   y       * ( X_SEGMENTS + 1 ) + x );
+                    indices.emplace_back( ( y + 1 ) * ( X_SEGMENTS + 1 ) + x );
+                }
+            }
+            else
+            {
+                for ( GLint x = X_SEGMENTS; x >= 0; --x )
+                {
+                    indices.emplace_back( ( y + 1 ) * ( X_SEGMENTS + 1 ) + x );
+                    indices.emplace_back(   y       * ( X_SEGMENTS + 1 ) + x );
+                }
+            }
+
+            oddRow = !oddRow;
+        }
+
+        indexCount = static_cast<GLsizei>( indices.size( ) );
+
+        std::vector<GLfloat> data;
+        for ( GLint i = 0; i < positions.size( ); ++i )
+        {
+            data.emplace_back( positions[i].x );
+            data.emplace_back( positions[i].y );
+            data.emplace_back( positions[i].z );
+
+            if ( !uv.empty( ) )
+            {
+                data.emplace_back( uv[i].x );
+                data.emplace_back( uv[i].y );
+            }
+
+            if ( !normals.empty( ) )
+            {
+                data.emplace_back( normals[i].x );
+                data.emplace_back( normals[i].y );
+                data.emplace_back( normals[i].z );
+            }
+        }
+
+        glBindVertexArray( sphereVAO );
+        glBindBuffer( GL_ARRAY_BUFFER, VBO );
+        glBufferData( GL_ARRAY_BUFFER, data.size( ) * sizeof( GLfloat ), &data[0], GL_STATIC_DRAW );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices.size( ) * sizeof( GLuint ), &indices[0], GL_STATIC_DRAW );
+
+        GLsizei stride = ( 3 + 2 + 3 ) * sizeof( GLfloat );
+        glEnableVertexAttribArray( 0 );
+        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, stride, nullptr );
+        glEnableVertexAttribArray( 1 );
+        glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, stride, (void *)( 3 * sizeof( GLfloat ) ) );
+        glEnableVertexAttribArray( 2 );
+        glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, stride, (void *)( 5 * sizeof( GLfloat ) ) );
+
+    }
+
+    glBindVertexArray( sphereVAO );
+    glDrawElements( GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0 );
+
 }

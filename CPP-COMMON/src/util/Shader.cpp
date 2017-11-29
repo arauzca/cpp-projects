@@ -109,7 +109,7 @@ Shader::Shader( const GLchar * vertex_file_path, const GLchar * fragment_file_pa
     glDeleteShader( vertShaderID );
     glDeleteShader( fragShaderID );
 }
-// Shader(const GLchar *, const GLchar *) //////////////////////////////////////////////////////////
+// Shader( const GLchar *, const GLchar * ) ////////////////////////////////////////////////////////
 
 
 
@@ -154,7 +154,7 @@ void Shader::setMatrix( const std::string &name, const glm::vec3 &matrix ) const
 {
     glUniformMatrix3fv( glGetUniformLocation( _Program, name.c_str( ) ), 1, GL_FALSE, glm::value_ptr( matrix ) );
 }
-// Shader::setMatrix4fv(const std::string &, const glm::mat4 &) const //////////////////////////////
+// Shader::setMatrix4fv( const std::string &, const glm::mat4 & ) const ////////////////////////////
 
 
 
@@ -163,4 +163,4 @@ void Shader::setMatrix( const std::string &name, const glm::mat4 &matrix ) const
 {
     glUniformMatrix4fv( glGetUniformLocation( _Program, name.c_str( ) ), 1, GL_FALSE, glm::value_ptr( matrix ) );
 }
-// Shader::setMatrix4fv(const std::string &, const glm::mat4 &) const //////////////////////////////
+// Shader::setMatrix4fv( const std::string &, const glm::mat4 & ) const ////////////////////////////
