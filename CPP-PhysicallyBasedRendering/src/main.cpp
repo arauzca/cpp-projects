@@ -119,6 +119,30 @@ int main()
     shader.setInt( "roughnessMap", 3 );
     shader.setInt( "aoMap", 4 );
 
+    GLuint albedo    = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/albedo.png") );
+    GLuint normal    = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/normal.png") );
+    GLuint metallic  = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/metallic.png") );
+    GLuint roughness = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/roughness.png") );
+    GLuint ao        = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/ao.png") );
+
+    // lights
+    // ------
+    glm::vec3 lightPositions[] = {
+            glm::vec3(0.0f, 0.0f, 10.0f),
+    };
+    glm::vec3 lightColors[] = {
+            glm::vec3(0.0f, 0.0f, 0.0f),
+    };
+    int nrRows = 14;
+    int nrColumns = 14;
+    float spacing = 2.5;
+
+    // initialize static shader uniforms before rendering
+    // --------------------------------------------------
+    glm::mat4 projection = glm::perspective(glm::radians(camera.GetZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+    shader.use();
+    shader.setMatrix( "projection", projection );
+
     GLfloat skyboxVertices[] = {
             // Positions
             -1.0f,  1.0f, -1.0f,
@@ -209,11 +233,58 @@ int main()
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
-
         // Draw our first triangle
         glm::mat4 model;
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
+
+        shader.use( );
+        shader.setMatrix( "view", view );
+        shader.setMatrix( "camPos", camera.GetPosition() );
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, albedo);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, normal);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, metallic);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, roughness);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, ao);
+
+
+        // render rows*column number of spheres with material properties defined by textures (they all have the same material properties)
+        for (unsigned int row = 0; row < nrRows; ++row)
+        {
+            for (unsigned int col = 0; col < nrColumns; ++col)
+            {
+                model = glm::mat4();
+                model = glm::translate(model, glm::vec3(
+                        (float)(col - (nrColumns / 2)) * spacing,
+                        (float)(row - (nrRows / 2)) * spacing,
+                        0.0f
+                ));
+                shader.setMatrix( "model", model );
+                renderSphere();
+            }
+        }
+
+        // render light source (simply re-render sphere at light positions)
+        // this looks a bit off as we use the same shader, but it'll make their positions obvious and
+        // keeps the codeprint small.
+        for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
+        {
+            glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+            newPos = lightPositions[i];
+            shader.setMatrix("lightPositions[" + std::to_string(i) + "]", newPos);
+            shader.setMatrix("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+
+            model = glm::mat4();
+            model = glm::translate(model, newPos);
+            model = glm::scale(model, glm::vec3(0.5f));
+            shader.setMatrix("model", model);
+            renderSphere();
+        }
 
 
         // Draw skybox as last
@@ -232,9 +303,9 @@ int main()
         glDepthFunc( GL_LESS ); // Set depth function back to default
 
 
-
         // Swap the buffers
         glfwSwapBuffers( window );
+        glfwPollEvents( );
     }
 
     glfwTerminate( );
