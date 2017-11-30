@@ -110,14 +110,19 @@ int main()
 
     // Setup and compile our shaders
     Shader shader( "shaders/sphere.vert", "shaders/sphere.frag" );
+    Shader shaderTexture( "shaders/sphere_textures.vert", "shaders/sphere_textures.frag" );
     Shader skyboxShader( "shaders/skybox.vert", "shaders/skybox.frag" );
 
     shader.use( );
-    shader.setInt( "albedoMap", 0 );
-    shader.setInt( "normalMap", 1 );
-    shader.setInt( "metallicMap", 2 );
-    shader.setInt( "roughnessMap", 3 );
-    shader.setInt( "aoMap", 4 );
+    shader.setVector( "albedo", 0.5f, 0.0f, 0.0f );
+    shader.setFloat( "ao", 1.0f );
+
+    shaderTexture.use( );
+    shaderTexture.setInt( "albedoMap", 0 );
+    shaderTexture.setInt( "normalMap", 1 );
+    shaderTexture.setInt( "metallicMap", 2 );
+    shaderTexture.setInt( "roughnessMap", 3 );
+    shaderTexture.setInt( "aoMap", 4 );
 
     GLuint albedo    = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/albedo.png") );
     GLuint normal    = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/normal.png") );
@@ -128,20 +133,30 @@ int main()
     // lights
     // ------
     glm::vec3 lightPositions[] = {
-            glm::vec3(0.0f, 0.0f, 10.0f),
+            glm::vec3(-10.0f,  10.0f, 10.0f),
+            glm::vec3( 10.0f,  10.0f, 10.0f),
+            glm::vec3(-10.0f, -10.0f, 10.0f),
+            glm::vec3( 10.0f, -10.0f, 10.0f),
     };
     glm::vec3 lightColors[] = {
-            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f)
     };
-    int nrRows = 14;
-    int nrColumns = 14;
-    float spacing = 2.5;
+    GLint nrRows    = 7;
+    GLint nrColumns = 7;
+    GLfloat spacing = 2.5;
 
-    // initialize static shader uniforms before rendering
+    // initialize static shaderTexture uniforms before rendering
     // --------------------------------------------------
     glm::mat4 projection = glm::perspective(glm::radians(camera.GetZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-    shader.use();
+
+    shader.use( );
     shader.setMatrix( "projection", projection );
+
+    shaderTexture.use( );
+    shaderTexture.setMatrix( "projection", projection );
 
     GLfloat skyboxVertices[] = {
             // Positions
@@ -214,8 +229,6 @@ int main()
     faces.push_back( "images/skybox_hd/front.jpg" );
     GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
 
-    shader.setInt( "texture1", 0 );
-
     // Game loop
     while( !glfwWindowShouldClose( window ) )
     {
@@ -239,58 +252,101 @@ int main()
 
         shader.use( );
         shader.setMatrix( "view", view );
-        shader.setMatrix( "camPos", camera.GetPosition() );
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, albedo);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, normal);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, metallic);
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, roughness);
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, ao);
+        shader.setVector( "camPos", camera.GetPosition() );
 
 
-        // render rows*column number of spheres with material properties defined by textures (they all have the same material properties)
-        for (unsigned int row = 0; row < nrRows; ++row)
+        // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
+        for (GLint row = 0; row < nrRows; ++row)
         {
-            for (unsigned int col = 0; col < nrColumns; ++col)
+            shader.setFloat("metallic", (GLfloat)row / (GLfloat)(nrRows - 1));
+
+            for (GLint col = 0; col < nrColumns; ++col)
             {
-                model = glm::mat4();
-                model = glm::translate(model, glm::vec3(
-                        (float)(col - (nrColumns / 2)) * spacing,
-                        (float)(row - (nrRows / 2)) * spacing,
-                        0.0f
-                ));
-                shader.setMatrix( "model", model );
-                renderSphere();
+                if ( row == glm::round(nrRows/2) && col == glm::round(nrColumns/2))
+                {
+                    shaderTexture.use( );
+                    shaderTexture.setMatrix( "view", view );
+                    shaderTexture.setVector( "camPos", camera.GetPosition() );
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, albedo);
+                    glActiveTexture(GL_TEXTURE1);
+                    glBindTexture(GL_TEXTURE_2D, normal);
+                    glActiveTexture(GL_TEXTURE2);
+                    glBindTexture(GL_TEXTURE_2D, metallic);
+                    glActiveTexture(GL_TEXTURE3);
+                    glBindTexture(GL_TEXTURE_2D, roughness);
+                    glActiveTexture(GL_TEXTURE4);
+                    glBindTexture(GL_TEXTURE_2D, ao);
+
+                    model = glm::mat4();
+                    model = glm::translate(model, glm::vec3(
+                            (GLfloat)(col - (nrColumns / 2)) * spacing,
+                            (GLfloat)(row - (nrRows / 2)) * spacing,
+                            0.0f
+                    ));
+                    shaderTexture.setMatrix( "model", model );
+                    renderSphere();
+
+                    for (GLint i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
+                    {
+                        glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+                        newPos = lightPositions[i];
+                        shaderTexture.setVector("lightPositions[" + std::to_string(i) + "]", newPos);
+                        shaderTexture.setVector("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+
+                        model = glm::mat4();
+                        model = glm::translate(model, newPos);
+                        model = glm::scale(model, glm::vec3(0.5f));
+                        shaderTexture.setMatrix("model", model);
+                        //renderSphere();
+                    }
+
+                    shader.use( );
+                    shader.setMatrix( "view", view );
+                    shader.setVector( "camPos", camera.GetPosition() );
+                }
+                else
+                {
+                    // we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
+                    // on direct lighting.
+                    shader.setFloat("roughness", glm::clamp((GLfloat)col / (GLfloat)(nrColumns - 1), 0.05f, 1.0f));
+
+                    model = glm::mat4();
+                    model = glm::translate(model, glm::vec3(
+                            (float)(col - (nrColumns / 2)) * spacing,
+                            (float)(row - (nrRows / 2)) * spacing,
+                            0.0f
+                    ));
+                    shader.setMatrix("model", model);
+                    renderSphere();
+                }
             }
+            std::cout << std::endl;
         }
 
         // render light source (simply re-render sphere at light positions)
         // this looks a bit off as we use the same shader, but it'll make their positions obvious and
         // keeps the codeprint small.
-        for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
+        for (GLint i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
         {
             glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
             newPos = lightPositions[i];
-            shader.setMatrix("lightPositions[" + std::to_string(i) + "]", newPos);
-            shader.setMatrix("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+            shader.setVector("lightPositions[" + std::to_string(i) + "]", newPos);
+            shader.setVector("lightColors[" + std::to_string(i) + "]", lightColors[i]);
 
             model = glm::mat4();
             model = glm::translate(model, newPos);
             model = glm::scale(model, glm::vec3(0.5f));
             shader.setMatrix("model", model);
-            renderSphere();
+            //renderSphere();
         }
 
 
         // Draw skybox as last
-        glDepthFunc( GL_LEQUAL );  // Change depth function so depth test passes when values are equal to depth buffer's content
+        glDepthFunc( GL_LEQUAL ); // Change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use( );
-        view = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );	// Remove any translation component of the view matrix
+        view = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) ); // Remove any translation component of the view matrix
 
         skyboxShader.setMatrix( "view",       view );
         skyboxShader.setMatrix( "projection", projection );

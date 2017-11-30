@@ -30,7 +30,16 @@ public:
     void setBool( const std::string &, GLboolean ) const;
     void setInt( const std::string &, GLint ) const;
     void setFloat( const std::string &, GLfloat ) const;
-    void setMatrix( const std::string &, const glm::vec3 & ) const;
+
+    void setVector( const std::string &, GLfloat, GLfloat ) const;
+    void setVector( const std::string &, GLfloat, GLfloat, GLfloat ) const;
+    void setVector( const std::string &, GLfloat, GLfloat, GLfloat, GLfloat ) const;
+    void setVector( const std::string &, const glm::vec2 & ) const;
+    void setVector( const std::string &, const glm::vec3 & ) const;
+    void setVector( const std::string &, const glm::vec4 & ) const;
+
+    void setMatrix( const std::string &, const glm::mat2 & ) const;
+    void setMatrix( const std::string &, const glm::mat3 & ) const;
     void setMatrix( const std::string &, const glm::mat4 & ) const;
 
     // public reference to the program ID, so that it is read-only /////////////////////////////////
