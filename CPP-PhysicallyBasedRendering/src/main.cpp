@@ -27,35 +27,36 @@
 // system includes
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 
 // Function prototypes
 void framebuffer_size_callback( GLFWwindow * window, int width, int height );
 void mouse_callback( GLFWwindow * window, double xpos, double ypos );
+void key_callback( GLFWwindow *window, int key, int scancode, int action, int mode );
+void mouse_button_callback( GLFWwindow * window, int button, int action, int mods );
 void scroll_callback( GLFWwindow * window, double xoffset, double yoffset );
 void processInput( GLFWwindow * window );
-
-void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
-void MouseCallback( GLFWwindow *window, double xPos, double yPos );
-void DoMovement( );
 void renderSphere( );
 
 
 // Properties
-const GLuint SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
+const GLuint SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080;
 
 
 // Camera
-Camera camera (glm::vec3( 0.0f, 0.0f, 3.0f ));
+Camera camera (glm::vec3( 0.0f, 0.0f, 30.0f ));
 GLfloat lastX = 800.0f / 2.0f;
 GLfloat lastY = 600.0f / 2.0f;
 
-
+bool hasClicked = false;
 bool firstMouse = true;
 bool keys[1024];
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+
+
 
 int main()
 {
@@ -66,6 +67,7 @@ int main()
     glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
     glfwWindowHint( GLFW_SAMPLES, 4 );
     glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+    glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
 
 #ifdef __APPLE__
     glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
@@ -89,10 +91,11 @@ int main()
 
 
     // GLFW Options
-    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+    //glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 
     // Set the required callback functions
-    glfwSetKeyCallback( window, KeyCallback );
+    glfwSetKeyCallback( window, key_callback );
+    glfwSetMouseButtonCallback( window, mouse_button_callback );
 
 
     // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
@@ -150,7 +153,7 @@ int main()
 
     // initialize static shaderTexture uniforms before rendering
     // --------------------------------------------------
-    glm::mat4 projection = glm::perspective(glm::radians(camera.GetZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(camera.GetZoom()), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 
     shader.use( );
     shader.setMatrix( "projection", projection );
@@ -237,9 +240,8 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Check and call events
-        glfwPollEvents( );
-        DoMovement( );
+        // input
+        processInput( window );
 
         // Clear the colorbuffer
         glClearColor( 0.05f, 0.05f, 0.05f, 1.0f );
@@ -256,13 +258,13 @@ int main()
 
 
         // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
-        for (GLint row = 0; row < nrRows; ++row)
+        for (GLuint row = 0; row < nrRows; ++row)
         {
-            shader.setFloat("metallic", (GLfloat)row / (GLfloat)(nrRows - 1));
+            shader.setFloat("metallic", (GLfloat)row / (GLfloat)nrRows);
 
-            for (GLint col = 0; col < nrColumns; ++col)
+            for (GLuint col = 0; col < nrColumns; ++col)
             {
-                if ( row == glm::round(nrRows/2) && col == glm::round(nrColumns/2))
+                if ( row == glm::round(nrRows/2) && col == glm::round(nrColumns/2) )
                 {
                     shaderTexture.use( );
                     shaderTexture.setMatrix( "view", view );
@@ -281,48 +283,31 @@ int main()
 
                     model = glm::mat4();
                     model = glm::translate(model, glm::vec3(
-                            (GLfloat)(col - (nrColumns / 2)) * spacing,
-                            (GLfloat)(row - (nrRows / 2)) * spacing,
+                            ((GLfloat)col - ((GLfloat)nrColumns / 2)) * spacing,
+                            ((GLfloat)row - ((GLfloat)nrRows / 2)) * spacing,
                             0.0f
                     ));
                     shaderTexture.setMatrix( "model", model );
                     renderSphere();
-
-                    for (GLint i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
-                    {
-                        glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-                        newPos = lightPositions[i];
-                        shaderTexture.setVector("lightPositions[" + std::to_string(i) + "]", newPos);
-                        shaderTexture.setVector("lightColors[" + std::to_string(i) + "]", lightColors[i]);
-
-                        model = glm::mat4();
-                        model = glm::translate(model, newPos);
-                        model = glm::scale(model, glm::vec3(0.5f));
-                        shaderTexture.setMatrix("model", model);
-                        //renderSphere();
-                    }
-
-                    shader.use( );
-                    shader.setMatrix( "view", view );
-                    shader.setVector( "camPos", camera.GetPosition() );
                 }
                 else
                 {
+                    shader.use();
+
                     // we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
                     // on direct lighting.
-                    shader.setFloat("roughness", glm::clamp((GLfloat)col / (GLfloat)(nrColumns - 1), 0.05f, 1.0f));
+                    shader.setFloat("roughness", glm::clamp((GLfloat)col / (GLfloat)nrColumns, 0.05f, 1.0f));
 
                     model = glm::mat4();
                     model = glm::translate(model, glm::vec3(
-                            (float)(col - (nrColumns / 2)) * spacing,
-                            (float)(row - (nrRows / 2)) * spacing,
+                            ((GLfloat)col - ((GLfloat)nrColumns / 2)) * spacing,
+                            ((GLfloat)row - ((GLfloat)nrRows / 2)) * spacing,
                             0.0f
                     ));
                     shader.setMatrix("model", model);
                     renderSphere();
                 }
             }
-            std::cout << std::endl;
         }
 
         // render light source (simply re-render sphere at light positions)
@@ -332,17 +317,18 @@ int main()
         {
             glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
             newPos = lightPositions[i];
+
+            shader.use();
             shader.setVector("lightPositions[" + std::to_string(i) + "]", newPos);
             shader.setVector("lightColors[" + std::to_string(i) + "]", lightColors[i]);
 
-            model = glm::mat4();
-            model = glm::translate(model, newPos);
-            model = glm::scale(model, glm::vec3(0.5f));
-            shader.setMatrix("model", model);
-            //renderSphere();
+            shaderTexture.use();
+            shaderTexture.setVector("lightPositions[" + std::to_string(i) + "]", newPos);
+            shaderTexture.setVector("lightColors[" + std::to_string(i) + "]", lightColors[i]);
         }
 
 
+        /*
         // Draw skybox as last
         glDepthFunc( GL_LEQUAL ); // Change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use( );
@@ -357,7 +343,7 @@ int main()
         glDrawArrays( GL_TRIANGLES, 0, 36 );
         glBindVertexArray( 0 );
         glDepthFunc( GL_LESS ); // Set depth function back to default
-
+        */
 
         // Swap the buffers
         glfwSwapBuffers( window );
@@ -384,20 +370,56 @@ void framebuffer_size_callback( GLFWwindow * window, int width, int height )
 // -------------------------------------------------------
 void mouse_callback( GLFWwindow * window, double xpos, double ypos )
 {
+    auto glXPos = static_cast<GLfloat>( xpos );
+    auto glYPos = static_cast<GLfloat>( ypos );
+
     if ( firstMouse )
     {
-        lastX      = xpos;
-        lastY      = ypos;
+        lastX      = glXPos;
+        lastY      = glYPos;
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;  // reversed since y-coordinates go from bottom to top
+    if (hasClicked)
+    {
+        GLfloat xoffset = glXPos - lastX;
+        GLfloat yoffset = lastY - glYPos;  // reversed since y-coordinates go from bottom to top
+        camera.ProcessMouseMovement( xoffset, yoffset );
+    }
 
-    lastX = xpos;
-    lastY = ypos;
 
-    camera.ProcessMouseMovement( xoffset, yoffset );
+    lastX = glXPos;
+    lastY = glYPos;
+
+}
+
+
+// Is called whenever a key is pressed/released via GLFW
+void key_callback( GLFWwindow *window, int key, int scancode, int action, int mode )
+{
+    if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
+    {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+
+    if ( key >= 0 && key < 1024 )
+    {
+        if ( action == GLFW_PRESS )
+        {
+            keys[key] = true;
+        }
+        else if ( action == GLFW_RELEASE )
+        {
+            keys[key] = false;
+        }
+    }
+}
+
+
+// Is called whenever a mouse button change its state
+void mouse_button_callback( GLFWwindow * window, int button, int action, int mods )
+{
+    hasClicked = button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS;
 }
 
 
@@ -405,12 +427,11 @@ void mouse_callback( GLFWwindow * window, double xpos, double ypos )
 // ----------------------------------------------------------------------
 void scroll_callback( GLFWwindow * window, double xoffset, double yoffset )
 {
-    camera.ProcessMouseScroll( yoffset );
+    camera.ProcessMouseScroll( static_cast<GLfloat>( yoffset ) );
 }
 
 
-// Moves/alters the camera positions based on user input
-void DoMovement( )
+void processInput( GLFWwindow * window )
 {
     // Camera controls
     if ( keys[GLFW_KEY_W] || keys[GLFW_KEY_UP] )
@@ -435,46 +456,6 @@ void DoMovement( )
 }
 
 
-// Is called whenever a key is pressed/released via GLFW
-void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode )
-{
-    if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
-    {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    }
-
-    if ( key >= 0 && key < 1024 )
-    {
-        if ( action == GLFW_PRESS )
-        {
-            keys[key] = true;
-        }
-        else if ( action == GLFW_RELEASE )
-        {
-            keys[key] = false;
-        }
-    }
-}
-
-
-void MouseCallback( GLFWwindow *window, double xPos, double yPos )
-{
-    if ( firstMouse )
-    {
-        lastX = xPos;
-        lastY = yPos;
-        firstMouse = false;
-    }
-
-    GLfloat xOffset = xPos - lastX;
-    GLfloat yOffset = lastY - yPos;  // Reversed since y-coordinates go from bottom to left
-
-    lastX = xPos;
-    lastY = yPos;
-
-    camera.ProcessMouseMovement( xOffset, yOffset );
-}
-
 // renders (and builds at first invocation) a sphere
 // -------------------------------------------------
 GLuint  sphereVAO = 0;
@@ -496,14 +477,14 @@ void renderSphere( )
 
         const GLuint    X_SEGMENTS = 64;
         const GLuint    Y_SEGMENTS = 64;
-        const GLfloat   PI = 3.14159265359f;
+        const GLfloat   PI         = 3.14159265359f;
 
         for ( GLuint y = 0; y <= Y_SEGMENTS; ++y )
         {
             for ( GLuint x = 0; x <= X_SEGMENTS; ++x )
             {
-                GLfloat xSegment = static_cast<GLfloat>( x ) / static_cast<GLfloat>( X_SEGMENTS );
-                GLfloat ySegment = static_cast<GLfloat>( y ) / static_cast<GLfloat>( Y_SEGMENTS );
+                GLfloat xSegment = (GLfloat)x / (GLfloat)X_SEGMENTS;
+                GLfloat ySegment = (GLfloat)y / (GLfloat)Y_SEGMENTS;
                 GLfloat xPos     = std::cos( xSegment * 2.0f * PI ) * std::sin( ySegment * PI );
                 GLfloat yPos     = std::cos( ySegment * PI );
                 GLfloat zPos     = std::sin( xSegment * 2.0f * PI ) * std::sin( ySegment * PI );
@@ -577,6 +558,6 @@ void renderSphere( )
     }
 
     glBindVertexArray( sphereVAO );
-    glDrawElements( GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0 );
+    glDrawElements( GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, nullptr );
 
 }
