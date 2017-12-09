@@ -271,15 +271,15 @@ int main()
                     shaderTexture.setVector( "camPos", camera.GetPosition() );
 
 
-                    glActiveTexture(GL_TEXTURE1);
+                    glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, albedo);
-                    glActiveTexture(GL_TEXTURE2);
+                    glActiveTexture(GL_TEXTURE1);
                     glBindTexture(GL_TEXTURE_2D, normal);
-                    glActiveTexture(GL_TEXTURE3);
+                    glActiveTexture(GL_TEXTURE2);
                     glBindTexture(GL_TEXTURE_2D, metallic);
-                    glActiveTexture(GL_TEXTURE4);
+                    glActiveTexture(GL_TEXTURE3);
                     glBindTexture(GL_TEXTURE_2D, roughness);
-                    glActiveTexture(GL_TEXTURE5);
+                    glActiveTexture(GL_TEXTURE4);
                     glBindTexture(GL_TEXTURE_2D, ao);
 
                     model = glm::mat4();
