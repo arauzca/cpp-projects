@@ -41,7 +41,7 @@ void renderSphere( );
 
 
 // Properties
-const GLuint SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080;
+const GLuint SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
 
 
 // Camera
@@ -270,15 +270,16 @@ int main()
                     shaderTexture.setMatrix( "view", view );
                     shaderTexture.setVector( "camPos", camera.GetPosition() );
 
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, albedo);
+
                     glActiveTexture(GL_TEXTURE1);
-                    glBindTexture(GL_TEXTURE_2D, normal);
+                    glBindTexture(GL_TEXTURE_2D, albedo);
                     glActiveTexture(GL_TEXTURE2);
-                    glBindTexture(GL_TEXTURE_2D, metallic);
+                    glBindTexture(GL_TEXTURE_2D, normal);
                     glActiveTexture(GL_TEXTURE3);
-                    glBindTexture(GL_TEXTURE_2D, roughness);
+                    glBindTexture(GL_TEXTURE_2D, metallic);
                     glActiveTexture(GL_TEXTURE4);
+                    glBindTexture(GL_TEXTURE_2D, roughness);
+                    glActiveTexture(GL_TEXTURE5);
                     glBindTexture(GL_TEXTURE_2D, ao);
 
                     model = glm::mat4();
@@ -328,7 +329,6 @@ int main()
         }
 
 
-        /*
         // Draw skybox as last
         glDepthFunc( GL_LEQUAL ); // Change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use( );
@@ -338,12 +338,13 @@ int main()
         skyboxShader.setMatrix( "projection", projection );
 
         // skybox cube
+        glActiveTexture(GL_TEXTURE0);
         glBindVertexArray( skyboxVAO );
         glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTexture );
         glDrawArrays( GL_TRIANGLES, 0, 36 );
         glBindVertexArray( 0 );
         glDepthFunc( GL_LESS ); // Set depth function back to default
-        */
+
 
         // Swap the buffers
         glfwSwapBuffers( window );
