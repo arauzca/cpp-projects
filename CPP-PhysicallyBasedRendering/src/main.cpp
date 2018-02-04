@@ -112,6 +112,8 @@ int main()
 
     // OpenGL options
     glEnable( GL_DEPTH_TEST );
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_BACK );
 
     // Setup and compile our shaders
     Shader shader( "shaders/sphere.vert", "shaders/sphere.frag" );
@@ -259,6 +261,8 @@ int main()
         shader.setMatrix( "view", view );
         shader.setVector( "camPos", camera.GetPosition() );
 
+        glFrontFace( GL_CW );
+
         // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
         for (GLuint row = 0; row < nrRows; ++row)
         {
@@ -325,8 +329,8 @@ int main()
             shaderTexture.setVector("lightColors[" + std::to_string(i) + "]", lightColors[i]);
         }
 
-
         // Draw skybox as last
+        glFrontFace( GL_CCW );
         glDepthFunc( GL_LEQUAL ); // Change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use( );
         view = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) ); // Remove any translation component of the view matrix
