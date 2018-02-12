@@ -15,7 +15,8 @@ endif()
 
 # setup CMAKE default search paths
 set(SOURCE_DIR .)
-set(CMAKE_MODULE_PATH "${CMAKE_HOME_DIRECTORY}/_CMAKE;${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH_AUX "${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH "${CMAKE_HOME_DIRECTORY}/_CMAKE;${CMAKE_MODULE_PATH_AUX}")
 
 # macro to force the build directory to be different from source directory
 include(MACRO_ENSURE_OUT_OF_SOURCE_BUILD)

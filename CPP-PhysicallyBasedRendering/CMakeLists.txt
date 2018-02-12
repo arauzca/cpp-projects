@@ -11,9 +11,12 @@ set( CMAKE_VERBOSE_MAKEFILE TRUE )
 set( CMAKE_COLOR_MAKEFILE TRUE )
 set( CMAKE_SUPPRESS_REGENERATION TRUE )
 set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" )
-set( CMAKE_MODULE_PATH "${CMAKE_HOME_DIRECTORY}/_CMAKE;/usr/local/lib/cmake" )
-set( CMAKE_PREFIX_PATH /usr/local/lib/cmake/glfw3 )
 
+set( dir "/usr/local/lib/cmake" )
+if ( EXISTS "${dir}" AND IS_DIRECTORY "${dir}" )
+    set( CMAKE_MODULE_PATH "/usr/local/lib/cmake;${CMAKE_MODULE_PATH_AUX}" )
+    # message("SEARCHING MODULES IN /USR/LOCAL/LIB/CMAKE")
+endif()
 
 # setup package root directories
 if( WIN32 )
@@ -105,12 +108,11 @@ source_group( "glsl" FILES ${GLSL} )
 
 
 # find packages and libs
-find_package (PkgConfig REQUIRED)
-find_package (OpenGL REQUIRED)
-find_package (glfw3 REQUIRED NO_MODULE)
-find_package (FLTK REQUIRED)
-find_package (GLM REQUIRED)
-find_package (GLEW REQUIRED STATIC)
+find_package( PkgConfig REQUIRED )
+find_package( OpenGL    REQUIRED )
+find_package( glfw3     REQUIRED NO_MODULE )
+find_package( GLM       REQUIRED )
+find_package( GLEW      REQUIRED STATIC )
 
 
 # find framework (specific to mac)
@@ -118,17 +120,16 @@ if ( APPLE )
     find_library( COCOA_LIBRARY Cocoa )
     find_library( IOKIT_LIBRARY IOKit REQUIRED )
     find_library( COREVID_LIBRARY CoreVideo REQUIRED )
-else()
+else ()
     set( COCOA_LIBRARY " " )
     set( IOKIT_LIBRARY " " )
     set( COREVID_LIBRARY " " )
-endif( APPLE )
+endif ( APPLE )
 
 
 # setup package headers
 include_directories(
         ${OPENGL_INCLUDE_DIR}
-        ${FLTK_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIR}
         ${GLM_INCLUDE_DIRS}
 )
@@ -154,7 +155,6 @@ add_custom_command( TARGET ${EXECUTABLE_NAME}
 target_link_libraries (${EXECUTABLE_NAME}
         libcommon
         glfw
-        ${FLTK_LIBRARIES}
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARY}
         ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
