@@ -128,8 +128,9 @@ endif ( APPLE )
 # setup package headers
 include_directories(
         ${OPENGL_INCLUDE_DIR}
-        ${GLEW_INCLUDE_DIR}
+        ${GLEW_INCLUDE_DIRS}
         ${GLM_INCLUDE_DIRS}
+        ${GLFW_INCLUDE_DIRS}
 )
 
 

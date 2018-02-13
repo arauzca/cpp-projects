@@ -52,6 +52,7 @@ include_directories(
         ${FLTK_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIR}
         ${GLM_INCLUDE_DIRS}
+        ${ASSIMP_INCLUDE_DIRS}
 )
 
 
