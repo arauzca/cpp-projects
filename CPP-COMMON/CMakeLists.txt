@@ -12,7 +12,6 @@ add_library(libcommon SHARED
 
 
 # find packages and libs
-find_package (PkgConfig REQUIRED)
 find_package (OpenGL REQUIRED)
 find_package (glfw3 REQUIRED NO_MODULE)
 find_package (FLTK REQUIRED)

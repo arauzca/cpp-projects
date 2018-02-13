@@ -107,7 +107,6 @@ source_group( "glsl" FILES ${GLSL} )
 
 
 # find packages and libs
-find_package( PkgConfig REQUIRED )
 find_package( OpenGL    REQUIRED )
 find_package( glfw3     REQUIRED NO_MODULE )
 find_package( GLM       REQUIRED )
