@@ -109,8 +109,8 @@ source_group( "glsl" FILES ${GLSL} )
 # find packages and libs
 find_package( OpenGL    REQUIRED )
 find_package( glfw3     REQUIRED NO_MODULE )
-find_package( GLM       REQUIRED )
 find_package( GLEW      REQUIRED STATIC )
+find_package( GLM       REQUIRED )
 
 
 # find framework (specific to mac)

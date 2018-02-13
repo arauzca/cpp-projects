@@ -1,6 +1,19 @@
 # Define library. Only source files here!
 project(CommonLibraries VERSION 0.1)
 
+
+# Set required paths
+set( CMAKE_PREFIX_PATH "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}" )
+set( glfw3_DIR         "${CMAKE_HOME_DIRECTORY}/_CMAKE/glfw3" )
+
+
+# setup package root directories
+set( ASSIMP_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/FLTK")
+set( GLM_ROOT_DIR    "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM" )
+set( GLEW_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
+set( ASSIMP_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/ASSIMP")
+
+
 file( GLOB SRCS
         ./src/util/*.cpp
         ./src/util/*.c
