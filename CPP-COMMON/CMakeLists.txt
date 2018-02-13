@@ -62,9 +62,10 @@ add_definitions( -DGLM_FORCE_RADIANS )
 # add framework (specific to mac)
 target_link_libraries (libcommon
         glfw
-        ${FLTK_LIBRARIES}
         ${OPENGL_LIBRARIES}
+        ${FLTK_LIBRARIES}
         ${GLEW_LIBRARY}
+        ${ASSIMP_LIBRARIES}
         ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
 
 
