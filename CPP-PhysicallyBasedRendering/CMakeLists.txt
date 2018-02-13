@@ -1,29 +1,28 @@
-cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
-project(PBR VERSION 0.1)
+# CMake file for Physically Based Rendering Project
+cmake_minimum_required( VERSION 3.10.0 FATAL_ERROR )
 
 
-# set project name as executable name
-set( EXECUTABLE_NAME ${PROJECT_NAME} )
+# Name and version of the project
+project( PBR VERSION 1.0 )
 
 
 # adjust some global CMake configuration settings
-set( CMAKE_VERBOSE_MAKEFILE TRUE )
-set( CMAKE_COLOR_MAKEFILE TRUE )
-set( CMAKE_SUPPRESS_REGENERATION TRUE )
-set( EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" )
-
-set( dir "/usr/local/lib/cmake" )
-if ( EXISTS "${dir}" AND IS_DIRECTORY "${dir}" )
-    set( CMAKE_MODULE_PATH "/usr/local/lib/cmake;${CMAKE_MODULE_PATH_AUX}" )
-    # message("SEARCHING MODULES IN /USR/LOCAL/LIB/CMAKE")
-endif()
+set( CMAKE_VERBOSE_MAKEFILE       TRUE )
+set( CMAKE_COLOR_MAKEFILE         TRUE )
+set( CMAKE_SUPPRESS_REGENERATION  TRUE )
+set( EXECUTABLE_OUTPUT_PATH       "${CMAKE_CURRENT_BINARY_DIR}/bin" )
+set( CMAKE_PREFIX_PATH            "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}" )
+set( glfw3_DIR                    "${CMAKE_HOME_DIRECTORY}/_CMAKE/glfw3" )
 
 # setup package root directories
+set( GLEW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
+set( GLM_ROOT_DIR  "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM" )
+set( GLFW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
 if( WIN32 )
     if( MSVC )
         add_definitions( -DGLEW_STATIC )
         set( CMAKE_EXE_LINKER_FLAGS_RELEASE "/INCREMENTAL:NO ${CMAKE_EXE_LINKER_FLAGS}" )
-        set( CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG /NODEFAULTLIB:MSVCRT ${CMAKE_EXE_LINKER_FLAGS}" )
+        set( CMAKE_EXE_LINKER_FLAGS_DEBUG   "/DEBUG /NODEFAULTLIB:MSVCRT ${CMAKE_EXE_LINKER_FLAGS}" )
     endif( MSVC )
 endif( WIN32 )
 
@@ -31,15 +30,15 @@ endif( WIN32 )
 if( CMAKE_CONFIGURATION_TYPES )
     set( CMAKE_INSTALL_PREFIX ./install )
     set( CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING
-            "Reset the configurations to what we need"
-            FORCE )
+                              "Reset the configurations to what we need"
+                              FORCE )
 endif( CMAKE_CONFIGURATION_TYPES )
 
 if( CMAKE_CONFIGURATION_TYPES )
     set( CMAKE_CONFIGURATION_TYPES Debug Release )
-    set( CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
-            "Reset the configurations to what we need"
-            FORCE )
+    set( CMAKE_CONFIGURATION_TYPES  "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
+                                    "Reset the configurations to what we need"
+                                    FORCE )
 endif( CMAKE_CONFIGURATION_TYPES )
 
 
@@ -48,11 +47,11 @@ if( WIN32 )
     if( MSVC )
         # find user and system name
         set( VC_USER_SYSTEM_NAME $ENV{USERDOMAIN} CACHE STRING SystemName )
-        set( VC_USER_USER_NAME $ENV{USERNAME} CACHE STRING UserName )
+        set( VC_USER_USER_NAME $ENV{USERNAME}     CACHE STRING UserName )
 
         # configure the template file
-        set( USER_FILE ${PROJECT_NAME}.vcxproj.user )
-        set( OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${USER_FILE} )
+        set( USER_FILE    ${PROJECT_NAME}.vcxproj.user )
+        set( OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR}/${USER_FILE} )
 
         # setup working directories in template file
         set( USERFILE_WORKING_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin/Debug )
