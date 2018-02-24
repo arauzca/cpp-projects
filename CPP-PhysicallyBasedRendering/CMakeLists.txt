@@ -10,20 +10,20 @@ project( PBR VERSION 1.0 )
 set( CMAKE_VERBOSE_MAKEFILE       TRUE )
 set( CMAKE_COLOR_MAKEFILE         TRUE )
 set( CMAKE_SUPPRESS_REGENERATION  TRUE )
-set( EXECUTABLE_OUTPUT_PATH       "${CMAKE_CURRENT_BINARY_DIR}/bin" )
+set( EXECUTABLE_OUTPUT_PATH       "${CMAKE_CURRENT_BINARY_DIR}/bin")
 
 # setup package root directories
 if(FOUND_REQUIRED_PACKAGES)
-  set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH_OLD};/usr/local/lib/cmake" )
-  set( CMAKE_PREFIX_PATH "/usr/local/lib/cmake/glfw3;${CMAKE_PREFIX_PATH}" )
-  set( CMAKE_PREFIX_PATH "/usr/local/lib/cmake/assimp-4.1;${CMAKE_PREFIX_PATH}" )
+  set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH_OLD};/usr/local/lib/cmake")
+  set( CMAKE_PREFIX_PATH "/usr/local/lib/cmake/glfw3;${CMAKE_PREFIX_PATH}")
   unset( FLTK_ROOT_DIR )
   unset( GLEW_ROOT_DIR )
   unset( GLM_ROOT_DIR )
   unset( ASSIMP_ROOT_DIR )
 else()
-  set( GLEW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
-  set( GLM_ROOT_DIR  "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM" )
+  set( GLEW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW")
+  set( GLM_ROOT_DIR  "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM")
+  set( ASSIMP_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/ASSIMP")
 endif()
 
 if( WIN32 )
@@ -169,4 +169,15 @@ target_link_libraries (${EXECUTABLE_NAME}
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARY}
         ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
+
+if(ASSIMP_ROOT_DIR)
+  find_package(assimp REQUIRED)
+  include_directories(
+    ${ASSIMP_INCLUDE_DIRS}
+  )
+  target_link_libraries(${EXECUTABLE_NAME}
+    ${ASSIMP_LIBRARIES}
+  )
+endif()
+
 add_dependencies(${EXECUTABLE_NAME} commonlibs glfw)

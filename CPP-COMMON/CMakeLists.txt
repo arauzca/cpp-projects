@@ -38,7 +38,6 @@ find_package(OpenGL REQUIRED)
 find_package(FLTK   REQUIRED)
 find_package(GLEW   REQUIRED STATIC)
 find_package(GLM    REQUIRED)
-#find_package(assimp REQUIRED NO_MODULE)
 
 
 # find framework (specific to mac)
@@ -62,6 +61,7 @@ include_directories(
 )
 
 
+
 # force older GLM versions to use radians instead of degrees
 add_definitions( -DGLM_FORCE_RADIANS )
 
@@ -74,6 +74,15 @@ target_link_libraries(commonlibs
         ${GLEW_LIBRARY}
         ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
 
+if(ASSIMP_ROOT_DIR)
+  find_package(assimp REQUIRED)
+  include_directories(
+    ${ASSIMP_INCLUDE_DIRS}
+  )
+  target_link_libraries(commonlibs
+    ${ASSIMP_LIBRARIES}
+  )
+endif()
 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
