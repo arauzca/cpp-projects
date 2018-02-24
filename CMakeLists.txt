@@ -39,6 +39,12 @@ if(APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET 10.13)
 endif()
 
+# Using Project's GLFW if not installed on OS
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory("${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
+
 
 # process found applications
 foreach(PROJECT ${PROJECTS})

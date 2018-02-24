@@ -14,8 +14,8 @@ if(APPLE)
 
    set(ASSIMP_LIBRARIES_PATH "${ASSIMP_ROOT_DIR}/lib/mac")
 
-   set(ASSIMP_LIBRARY "${ASSIMP_LIBRARIES_PATH}/libIrrXML.a")
-   set(ASSIMP_LIBRARY_DEBUG "${ASSIMP_LIBRARIES_PATH}/libIrrXML.a")
+   set(ASSIMP_LIBRARY "${ASSIMP_LIBRARIES_PATH}/libassimp.dylib")
+   set(ASSIMP_LIBRARY_DEBUG "${ASSIMP_LIBRARIES_PATH}/libassimp.dylib")
 endif()
 
 # handle the QUIETLY and REQUIRED arguments and set ASSIMP_FOUND to TRUE if all listed variables are TRUE

@@ -4,12 +4,11 @@ project(CommonLibraries VERSION 0.1)
 
 # Set required paths
 set( CMAKE_PREFIX_PATH "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}" )
-set( glfw3_DIR         "${CMAKE_HOME_DIRECTORY}/_CMAKE/glfw3" )
 
 
 # setup package root directories
-set( GLFW_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
-set( FLTK_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/FLTK")
+# set( GLFW_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
+set( FLTK_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/FLTK")
 set( GLEW_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
 set( GLM_ROOT_DIR    "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM" )
 set( ASSIMP_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/ASSIMP")
@@ -27,7 +26,7 @@ add_library(libcommon SHARED
 
 # find packages and libs
 find_package (OpenGL REQUIRED)
-find_package (glfw3 REQUIRED NO_MODULE)
+#find_package (glfw3 REQUIRED NO_MODULE)
 find_package (FLTK REQUIRED)
 find_package (GLEW REQUIRED STATIC)
 find_package (GLM REQUIRED)

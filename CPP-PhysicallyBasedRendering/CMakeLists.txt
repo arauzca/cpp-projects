@@ -12,7 +12,6 @@ set( CMAKE_COLOR_MAKEFILE         TRUE )
 set( CMAKE_SUPPRESS_REGENERATION  TRUE )
 set( EXECUTABLE_OUTPUT_PATH       "${CMAKE_CURRENT_BINARY_DIR}/bin" )
 set( CMAKE_PREFIX_PATH            "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}" )
-set( glfw3_DIR                    "${CMAKE_HOME_DIRECTORY}/_CMAKE/glfw3" )
 
 # setup package root directories
 set( GLEW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
@@ -108,9 +107,10 @@ source_group( "glsl" FILES ${GLSL} )
 
 # find packages and libs
 find_package( OpenGL    REQUIRED )
-find_package( glfw3     REQUIRED NO_MODULE )
+#find_package( glfw3     REQUIRED NO_MODULE )
 find_package( GLEW      REQUIRED STATIC )
 find_package( GLM       REQUIRED )
+find_package( ASSIMP    REQUIRED )
 
 
 # find framework (specific to mac)
@@ -131,6 +131,7 @@ include_directories(
         ${GLEW_INCLUDE_DIRS}
         ${GLM_INCLUDE_DIRS}
         ${GLFW_INCLUDE_DIRS}
+        ${ASSIMP_INCLUDE_DIRS}
 )
 
 
@@ -156,5 +157,6 @@ target_link_libraries (${EXECUTABLE_NAME}
         glfw
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARY}
+        ${ASSIMP_LIBRARIES}
         ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
-add_dependencies(${EXECUTABLE_NAME} libcommon)
+add_dependencies(${EXECUTABLE_NAME} libcommon glfw)

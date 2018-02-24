@@ -32,8 +32,8 @@ endif()
 # locate header files and put user specified location at beginning of search
 if(GLEW_ROOT_DIR)
     set(_GLEW_HEADER_SEARCH_DIRS "${GLEW_ROOT_DIR}"
-                                "${GLEW_ROOT_DIR}/include"
-                                 ${_GLEW_HEADER_SEARCH_DIRS})
+                                 "${GLEW_ROOT_DIR}/include"
+                                 "${_GLEW_HEADER_SEARCH_DIRS}")
 endif(GLEW_ROOT_DIR)
 
 find_path(GLEW_INCLUDE_DIR "GL/glew.h" PATHS ${_GLEW_HEADER_SEARCH_DIRS})
