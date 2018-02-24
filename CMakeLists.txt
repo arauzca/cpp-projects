@@ -18,9 +18,31 @@ endif()
 
 
 # setup CMAKE default search paths
-set( SOURCE_DIR .)
-set( CMAKE_PREFIX_PATH "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}")
-set( CMAKE_MODULE_PATH "${CMAKE_HOME_DIRECTORY}/_CMAKE;${CMAKE_MODULE_PATH}")
+set( SOURCE_DIR . )
+set( CMAKE_MODULE_PATH_OLD "${CMAKE_MODULE_PATH}" )
+set( CMAKE_MODULE_PATH     "${CMAKE_HOME_DIRECTORY}/_CMAKE;${CMAKE_MODULE_PATH}" )
+set( OS_CMAKE_MODULES_PATH "/usr/local/opt/" )
+set( REQUIRED_PACKAGES
+  "assimp"
+  "fltk"
+  "glew"
+  "glfw"
+  "glm"
+)
+
+foreach(package ${REQUIRED_PACKAGES})
+  set(FOUND_REQUIRED_PACKAGES ON CACHE BOOL "" FORCE)
+  if(NOT EXISTS "${OS_CMAKE_MODULES_PATH}/${package}")
+    message("Package \"${package}\" not installed using project packages.")
+    set(FOUND_REQUIRED_PACKAGES OFF CACHE BOOL "" FORCE)
+  endif()
+endforeach()
+
+if(FOUND_REQUIRED_PACKAGES)
+  message("Found all required packages installed on OS, using them instead of the ones with this project")
+else()
+  set( CMAKE_PREFIX_PATH "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}" )
+endif()
 
 
 # macro to force the build directory to be different from source directory
@@ -40,10 +62,12 @@ if(APPLE)
 endif()
 
 # Using Project's GLFW if not installed on OS
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory("${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
+if(NOT FOUND_REQUIRED_PACKAGES)
+  set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+  set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+  add_subdirectory("${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
+endif()
 
 
 # process found applications

@@ -2,16 +2,20 @@
 project(CommonLibraries VERSION 0.1)
 
 
-# Set required paths
-set( CMAKE_PREFIX_PATH "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}" )
-
-
 # setup package root directories
-# set( GLFW_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
-set( FLTK_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/FLTK")
-set( GLEW_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
-set( GLM_ROOT_DIR    "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM" )
-set( ASSIMP_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/ASSIMP")
+if(FOUND_REQUIRED_PACKAGES)
+  set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH_OLD};/usr/local/lib/cmake")
+  set( CMAKE_PREFIX_PATH "/usr/local/lib/cmake/glfw3")
+  unset( FLTK_ROOT_DIR )
+  unset( GLEW_ROOT_DIR )
+  unset( GLM_ROOT_DIR )
+  unset( ASSIMP_ROOT_DIR )
+else()
+  set( FLTK_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/FLTK")
+  set( GLEW_ROOT_DIR   "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW")
+  set( GLM_ROOT_DIR    "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM")
+  set( ASSIMP_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/ASSIMP")
+endif()
 
 
 file( GLOB SRCS
@@ -20,28 +24,32 @@ file( GLOB SRCS
         ./src/SOIL2/*.cpp
         ./src/SOIL2/*.c)
 
-add_library(libcommon SHARED
+add_library(commonlibs SHARED
         ${SRCS})
 
 
 # find packages and libs
-find_package (OpenGL REQUIRED)
-#find_package (glfw3 REQUIRED NO_MODULE)
-find_package (FLTK REQUIRED)
-find_package (GLEW REQUIRED STATIC)
-find_package (GLM REQUIRED)
-find_package (ASSIMP REQUIRED)
+if(FOUND_REQUIRED_PACKAGES)
+  find_package(PkgConfig REQUIRED)
+  find_package(glfw3     REQUIRED NO_MODULE)
+endif()
+
+find_package(OpenGL REQUIRED)
+find_package(FLTK   REQUIRED)
+find_package(GLEW   REQUIRED STATIC)
+find_package(GLM    REQUIRED)
+#find_package(assimp REQUIRED NO_MODULE)
 
 
 # find framework (specific to mac)
 if ( APPLE )
-    find_library( COCOA_LIBRARY Cocoa )
-    find_library( IOKIT_LIBRARY IOKit REQUIRED )
-    find_library( COREVID_LIBRARY CoreVideo REQUIRED )
+    find_library(COCOA_LIBRARY   Cocoa )
+    find_library(IOKIT_LIBRARY   IOKit REQUIRED )
+    find_library(COREVID_LIBRARY CoreVideo REQUIRED )
 else()
-    set( COCOA_LIBRARY " " )
-    set( IOKIT_LIBRARY " " )
-    set( COREVID_LIBRARY " " )
+    set(COCOA_LIBRARY "")
+    set(IOKIT_LIBRARY "")
+    set(COREVID_LIBRARY "")
 endif( APPLE )
 
 
@@ -51,34 +59,33 @@ include_directories(
         ${FLTK_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIR}
         ${GLM_INCLUDE_DIRS}
-        ${ASSIMP_INCLUDE_DIRS}
 )
 
 
 # force older GLM versions to use radians instead of degrees
 add_definitions( -DGLM_FORCE_RADIANS )
 
+
 # add framework (specific to mac)
-target_link_libraries (libcommon
+target_link_libraries(commonlibs
         glfw
         ${OPENGL_LIBRARIES}
         ${FLTK_LIBRARIES}
         ${GLEW_LIBRARY}
-        ${ASSIMP_LIBRARIES}
         ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
 
 
 # Define headers for this library. PUBLIC headers are used for
 # compiling the library, and will be added to consumers' build
 # paths.
-target_include_directories(libcommon PUBLIC
+target_include_directories(commonlibs PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
         $<INSTALL_INTERFACE:include>
         PRIVATE src)
 
 # If we have compiler requirements for this library, list them
 # here
-set_property(TARGET libcommon PROPERTY CXX_STANDARD 17)
+set_property(TARGET commonlibs PROPERTY CXX_STANDARD 17)
 #target_compile_features(mem_mngr
 #        PUBLIC cxx_auto_type
 #        PRIVATE cxx_variadic_templates)

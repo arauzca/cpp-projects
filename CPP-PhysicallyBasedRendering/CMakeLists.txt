@@ -11,12 +11,21 @@ set( CMAKE_VERBOSE_MAKEFILE       TRUE )
 set( CMAKE_COLOR_MAKEFILE         TRUE )
 set( CMAKE_SUPPRESS_REGENERATION  TRUE )
 set( EXECUTABLE_OUTPUT_PATH       "${CMAKE_CURRENT_BINARY_DIR}/bin" )
-set( CMAKE_PREFIX_PATH            "${CMAKE_HOME_DIRECTORY}/_LIBS;${CMAKE_PREFIX_PATH}" )
 
 # setup package root directories
-set( GLEW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
-set( GLM_ROOT_DIR  "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM" )
-set( GLFW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLFW")
+if(FOUND_REQUIRED_PACKAGES)
+  set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH_OLD};/usr/local/lib/cmake" )
+  set( CMAKE_PREFIX_PATH "/usr/local/lib/cmake/glfw3;${CMAKE_PREFIX_PATH}" )
+  set( CMAKE_PREFIX_PATH "/usr/local/lib/cmake/assimp-4.1;${CMAKE_PREFIX_PATH}" )
+  unset( FLTK_ROOT_DIR )
+  unset( GLEW_ROOT_DIR )
+  unset( GLM_ROOT_DIR )
+  unset( ASSIMP_ROOT_DIR )
+else()
+  set( GLEW_ROOT_DIR "${CMAKE_HOME_DIRECTORY}/_LIBS/GLEW" )
+  set( GLM_ROOT_DIR  "${CMAKE_HOME_DIRECTORY}/_LIBS/GLM" )
+endif()
+
 if( WIN32 )
     if( MSVC )
         add_definitions( -DGLEW_STATIC )
@@ -106,11 +115,14 @@ source_group( "glsl" FILES ${GLSL} )
 
 
 # find packages and libs
-find_package( OpenGL    REQUIRED )
-#find_package( glfw3     REQUIRED NO_MODULE )
-find_package( GLEW      REQUIRED STATIC )
-find_package( GLM       REQUIRED )
-find_package( ASSIMP    REQUIRED )
+if(FOUND_REQUIRED_PACKAGES)
+  find_package(PkgConfig REQUIRED)
+  find_package(glfw3     REQUIRED NO_MODULE)
+endif()
+
+find_package(OpenGL    REQUIRED)
+find_package(GLEW      REQUIRED STATIC)
+find_package(GLM       REQUIRED)
 
 
 # find framework (specific to mac)
@@ -131,7 +143,6 @@ include_directories(
         ${GLEW_INCLUDE_DIRS}
         ${GLM_INCLUDE_DIRS}
         ${GLFW_INCLUDE_DIRS}
-        ${ASSIMP_INCLUDE_DIRS}
 )
 
 
@@ -153,10 +164,9 @@ add_custom_command( TARGET ${EXECUTABLE_NAME}
 
 # add framework (specific to mac)
 target_link_libraries (${EXECUTABLE_NAME}
-        libcommon
+        commonlibs
         glfw
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARY}
-        ${ASSIMP_LIBRARIES}
         ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
-add_dependencies(${EXECUTABLE_NAME} libcommon glfw)
+add_dependencies(${EXECUTABLE_NAME} commonlibs glfw)

@@ -1,4 +1,6 @@
 # locate header files and put user specified location at beginning of search
+message("USING PROJECT ASSIMP")
+
 if(ASSIMP_ROOT_DIR)
     set(_ASSIMP_HEADER_SEARCH_DIRS "${ASSIMP_ROOT_DIR}"
                                 "${ASSIMP_ROOT_DIR}/include"
