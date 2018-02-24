@@ -45,10 +45,12 @@ const GLuint SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
 
 
 // Camera
-Camera camera (glm::vec3( 0.0f, 0.0f, 30.0f ));
+Camera  camera(glm::vec3( -1.25f, -1.25f, 30.0f ));
 GLfloat lastX = 800.0f / 2.0f;
 GLfloat lastY = 600.0f / 2.0f;
 
+
+// Events
 bool hasClicked = false;
 bool firstMouse = true;
 bool keys[1024];
@@ -64,8 +66,9 @@ int main()
     glfwInit( );
     // Set all the required options for GLFW
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 2 );
     glfwWindowHint( GLFW_SAMPLES, 4 );
+    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
     glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
 
@@ -110,6 +113,8 @@ int main()
 
     // OpenGL options
     glEnable( GL_DEPTH_TEST );
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_BACK );
 
     // Setup and compile our shaders
     Shader shader( "shaders/sphere.vert", "shaders/sphere.frag" );
@@ -240,15 +245,16 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+
         // input
         processInput( window );
+
 
         // Clear the colorbuffer
         glClearColor( 0.05f, 0.05f, 0.05f, 1.0f );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
-        // Draw our first triangle
         glm::mat4 model;
         glm::mat4 view = camera.GetViewMatrix();
 
@@ -256,6 +262,7 @@ int main()
         shader.setMatrix( "view", view );
         shader.setVector( "camPos", camera.GetPosition() );
 
+        glFrontFace( GL_CW );
 
         // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
         for (GLuint row = 0; row < nrRows; ++row)
@@ -264,6 +271,13 @@ int main()
 
             for (GLuint col = 0; col < nrColumns; ++col)
             {
+                model = glm::mat4();
+                model = glm::translate(model, glm::vec3(
+                        ((GLfloat)col - ((GLfloat)nrColumns / 2)) * spacing,
+                        ((GLfloat)row - ((GLfloat)nrRows / 2)) * spacing,
+                        0.0f
+                ));
+
                 if ( row == glm::round(nrRows/2) && col == glm::round(nrColumns/2) )
                 {
                     shaderTexture.use( );
@@ -282,14 +296,7 @@ int main()
                     glActiveTexture(GL_TEXTURE4);
                     glBindTexture(GL_TEXTURE_2D, ao);
 
-                    model = glm::mat4();
-                    model = glm::translate(model, glm::vec3(
-                            ((GLfloat)col - ((GLfloat)nrColumns / 2)) * spacing,
-                            ((GLfloat)row - ((GLfloat)nrRows / 2)) * spacing,
-                            0.0f
-                    ));
                     shaderTexture.setMatrix( "model", model );
-                    renderSphere();
                 }
                 else
                 {
@@ -299,15 +306,10 @@ int main()
                     // on direct lighting.
                     shader.setFloat("roughness", glm::clamp((GLfloat)col / (GLfloat)nrColumns, 0.05f, 1.0f));
 
-                    model = glm::mat4();
-                    model = glm::translate(model, glm::vec3(
-                            ((GLfloat)col - ((GLfloat)nrColumns / 2)) * spacing,
-                            ((GLfloat)row - ((GLfloat)nrRows / 2)) * spacing,
-                            0.0f
-                    ));
                     shader.setMatrix("model", model);
-                    renderSphere();
                 }
+
+                renderSphere();
             }
         }
 
@@ -328,8 +330,8 @@ int main()
             shaderTexture.setVector("lightColors[" + std::to_string(i) + "]", lightColors[i]);
         }
 
-
         // Draw skybox as last
+        glFrontFace( GL_CCW );
         glDepthFunc( GL_LEQUAL ); // Change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use( );
         view = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) ); // Remove any translation component of the view matrix
@@ -344,7 +346,6 @@ int main()
         glDrawArrays( GL_TRIANGLES, 0, 36 );
         glBindVertexArray( 0 );
         glDepthFunc( GL_LESS ); // Set depth function back to default
-
 
         // Swap the buffers
         glfwSwapBuffers( window );
