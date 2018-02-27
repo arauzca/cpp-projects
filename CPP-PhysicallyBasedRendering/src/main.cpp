@@ -121,8 +121,6 @@ int main()
     glEnable( GL_DEPTH_TEST );
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    //glEnable( GL_CULL_FACE );
-    //glCullFace( GL_FRONT );
 
     // Setup and compile our shaders
     Shader pbrShader("shaders/pbr.vert", "shaders/pbr.frag");
@@ -137,7 +135,7 @@ int main()
     pbrShader.setInt("irradianceMap", 0);
     pbrShader.setInt("prefilterMap", 1);
     pbrShader.setInt("brdfLUT", 2);
-    pbrShader.setVector("albedo", 0.75f, 0.75f, 0.75f);
+    pbrShader.setVector("albedo", 0.5f, 0.0f, 0.0f);
     pbrShader.setFloat("ao", 1.0f);
     
     textureShader.use();
@@ -153,11 +151,11 @@ int main()
     backgroundShader.use();
     backgroundShader.setInt("environmentMap", 0);
 
-    GLuint albedo    = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/albedo.png") );
-    GLuint normal    = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/normal.png") );
-    GLuint metallic  = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/metallic.png") );
-    GLuint roughness = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/roughness.png") );
-    GLuint ao        = TextureLoading::LoadTexture( (GLchar *)("textures/pbr/rusted_iron/ao.png") );
+    GLuint albedo    = TextureLoading::LoadTexture( (GLchar *)("images/textures/materials/gold-scuffed/albedo_boosted.png") );
+    GLuint normal    = TextureLoading::LoadTexture( (GLchar *)("images/textures/materials/gold-scuffed/normal.png") );
+    GLuint metallic  = TextureLoading::LoadTexture( (GLchar *)("images/textures/materials/gold-scuffed/metallic.png") );
+    GLuint roughness = TextureLoading::LoadTexture( (GLchar *)("images/textures/materials/gold-scuffed/roughness.png") );
+    GLuint ao        = TextureLoading::LoadTexture( (GLchar *)("images/textures/materials/gold-scuffed/ao.png") );
 
     // lights
     // ------
@@ -195,7 +193,7 @@ int main()
     // ---------------------------------
     stbi_set_flip_vertically_on_load( true );
     GLint width, height, nrComponents;
-    GLfloat *data = stbi_loadf("textures/hdr/monvalley.hdr", &width, &height, &nrComponents, 0);
+    GLfloat *data = stbi_loadf("images/textures/hdr/monvalley.hdr", &width, &height, &nrComponents, 0);
     GLuint hdrTexture;
     
     if (data)
@@ -307,8 +305,8 @@ int main()
     {
         irradianceShader.setMatrix("view", captureViews[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderCube();
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -385,6 +383,7 @@ int main()
     
     glViewport(0, 0, 512, 512);
     brdfShader.use();
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderQuad();
     
@@ -443,8 +442,6 @@ int main()
         glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-
-        //glFrontFace( GL_CW );
 
         // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
         for (GLuint row = 0; row < nrRows; ++row)
@@ -532,8 +529,6 @@ int main()
 
         
         // render skybox (render at last to prevent overdraw)
-        //glFrontFace( GL_CCW );
-        //glDepthFunc( GL_LEQUAL );
         backgroundShader.use();
         backgroundShader.setMatrix("view", view);
         glActiveTexture(GL_TEXTURE0);
@@ -541,7 +536,6 @@ int main()
         // glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // display irradiance map
         // glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap); // display prefilter map
         renderCube();
-        //glDepthFunc( GL_LESS );
         
         
         // render BRDF map to screen
