@@ -1,3 +1,4 @@
 [submodule "_LIBS"]
 	path = _LIBS
 	url = github:arauzca/cg-util.git
+        ignore = dirty
