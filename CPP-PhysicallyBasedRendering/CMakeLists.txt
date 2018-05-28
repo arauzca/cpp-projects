@@ -66,7 +66,7 @@ if( WIN32 )
         set( USERFILE_WORKING_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bin/Release )
         set( USERFILE_ARGUMENTS_RELEASE "" )
         set( USERFILE_ARGUMENTS_DEBUG "" )
-        configure_file(${CMAKE_HOME_DIRECTORY}/_CMAKE/CG-PROJECTS.vcxproj.usertemplate ${OUTPUT_PATH} @ONLY )
+        configure_file(${CMAKE_HOME_DIRECTORY}/_CMAKE/CPP-PROJECTS.vcxproj.usertemplate ${OUTPUT_PATH} @ONLY )
     endif( MSVC )
 endif( WIN32 )
 
@@ -153,7 +153,7 @@ add_definitions( -DGLM_FORCE_RADIANS )
 # define target dependencies and build instructions
 set(EXECUTABLE_NAME ${PROJECT_NAME})
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HDRS} ${GLSL})
-set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 14)
 
 
 # copy resources directory

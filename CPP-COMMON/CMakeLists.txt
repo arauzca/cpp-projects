@@ -94,7 +94,7 @@ target_include_directories(commonlibs PUBLIC
 
 # If we have compiler requirements for this library, list them
 # here
-set_property(TARGET commonlibs PROPERTY CXX_STANDARD 17)
+set_property(TARGET commonlibs PROPERTY CXX_STANDARD 14)
 #target_compile_features(mem_mngr
 #        PUBLIC cxx_auto_type
 #        PRIVATE cxx_variadic_templates)
