@@ -33,8 +33,6 @@ int main()
 	// Save HDR image.
 	imwrite("hdrDebevec.hdr", hdrDebevec);
 
-	waitKey(0);
-
 	return 0;
 }
 
