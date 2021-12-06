@@ -51,9 +51,9 @@ endif()
 
 # Find sources.
 file(GLOB SRCS
-    ./sources/*.c
-    ./sources/*.cpp)
-source_group("sources" FILES ${SRCS})
+    ./src/*.c
+    ./src/*.cpp)
+source_group("source" FILES ${SRCS})
 
 # Find headers (let them show up in the IDEs).
 file(GLOB HDRS
