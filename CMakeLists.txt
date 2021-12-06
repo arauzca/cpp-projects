@@ -56,11 +56,32 @@ GET_DIRECTORIES( PROJECTS CPP-* ${SOURCE_DIR} )
 
 # MacOS specific settings.
 if( APPLE )
+  message( "Configuring XCode:" )
   # Set the fixed min. deployment target platform version
   # in the project settings of XCode (for convenience reasons).
   set( CMAKE_OSX_DEPLOYMENT_TARGET 12.0 )
-  set( CMAKE_SYSTEM_NAME macOS )
-  set( XCODE_CODESIGNIDENTITY "Apple Development: Carlos Arauz (Personal Team)" )
+  message( "-- CMAKE_OSX_DEPLOYMENT_TARGET = ${CMAKE_OSX_DEPLOYMENT_TARGET}" )
+
+  set( CMAKE_SYSTEM_NAME "macOS" )
+  message( "-- CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}" )
+
+  set( CMAKE_SYSTEM_PROCESSOR "arm64" )
+  message( "-- CMAKE_SYSTEM_PROCESSOR = ${CMAKE_SYSTEM_PROCESSOR}" )
+
+  if( XCODE )
+    set( CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "ch.arauz.cpp-projects" )
+    message( "-- CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER = ${CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER}" )
+  
+    if( NOT CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY )
+      # set( CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "" )
+      # message( "-- CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY = ${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY}" )
+    endif()
+  
+    if( NOT CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM )
+      # set( CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "" )
+      # message( "-- CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM = ${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}" )
+    endif()
+  endif()
 endif()
 
 # Using project's GLFW if not installed on OS.
