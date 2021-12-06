@@ -1,0 +1,3 @@
+[submodule "_LIBS"]
+	path = _LIBS
+	url = git@github.com:arauzca/cg-util.git
