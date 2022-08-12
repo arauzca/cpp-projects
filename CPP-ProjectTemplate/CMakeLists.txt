@@ -1,7 +1,7 @@
 # CMakeLists for the Project: ProjectTemplate.
 
-# Set the minimum CMake Version to 3.20.
-cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+# Set the minimum CMake Version to 3.24.
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 # Set the project name and version.
 project(ProjectTemplate VERSION 1.0)
@@ -55,7 +55,10 @@ set(CMAKE_FOLDER "APPS")
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HDRS})
 target_link_libraries(${EXECUTABLE_NAME} ${LIBS_RELEASE} ${LIBS_DEBUG})
 
+if(BUILD_PROJECT_TESTS)
+  enable_testing()
 
-# Adding tests if available.
-include(FUNCTION_ADD_TESTS)
-ADD_TESTS("${CMAKE_CURRENT_SOURCE_DIR}/test")
+  # Adding tests if available.
+  include(FUNCTION_ADD_TESTS)
+  ADD_TESTS("${CMAKE_CURRENT_SOURCE_DIR}/test")
+endif()

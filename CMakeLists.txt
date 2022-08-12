@@ -2,7 +2,7 @@
 # Builds every project that starts with the prefix "CPP-" and
 # each project needs to have its own CMakeLists-file.
 
-cmake_minimum_required(VERSION 3.5...3.22 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5...3.24 FATAL_ERROR)
 
 if(APPLE)
   set(CMAKE_MACOSX_RPATH OFF)
@@ -16,7 +16,8 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "TEST")
 # Policy correction. ---------------------------------------------------------------------------------------------------
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
   cmake_policy((VERSION ${CMAKE_VERSION}))
-endif()
+  endif()
+  message("CMAKE VERSION = ${CMAKE_VERSION}")
 
 
 # Set the project name and version. ------------------------------------------------------------------------------------
@@ -87,6 +88,9 @@ if(APPLE)
   endif()
 endif()
 
+if(BUILD_PROJECT_TESTS)
+  enable_testing()
+endif()
 
 # Intergrating extern dependencies.
 message("Intergrating extern dependencies: ${CMAKE_HOME_DIRECTORY}/extern")

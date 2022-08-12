@@ -1,5 +1,5 @@
-# Set the minimum CMake Version to 3.20.
-cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+# Set the minimum CMake Version to 3.24.
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 set(ALLOW_DUPLICATE_CUSTOM_TARGETS TRUE)
 include(FetchContent)
@@ -12,7 +12,7 @@ if(NOT ASSIMP_FOUND)
   FetchContent_Declare(
     assimp
     GIT_REPOSITORY  https://github.com/assimp/assimp.git
-    GIT_TAG         v5.1.3)
+    GIT_TAG         v5.2.4)
 
   set(BUILD_SHARED_LIBS  OFF CACHE BOOL "" FORCE)
   set(ASSIMP_INSTALL     OFF CACHE BOOL "" FORCE)
@@ -27,7 +27,8 @@ endif()
 if(NOT FLTK_FOUND)
   FetchContent_Declare(
     fltk
-    GIT_REPOSITORY  https://github.com/fltk/fltk.git)
+    GIT_REPOSITORY  https://github.com/fltk/fltk.git
+    GIT_TAG         release-1.3.8)
 
   set(FLTK_BUILD_TEST OFF CACHE BOOL "" FORCE)
 
@@ -42,7 +43,7 @@ if(NOT glfw3_FOUND)
   FetchContent_Declare(
     glfw
     GIT_REPOSITORY  https://github.com/glfw/glfw.git
-    GIT_TAG         3.3.6)
+    GIT_TAG         3.3.8)
 
   set( GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE )
   set( GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE )

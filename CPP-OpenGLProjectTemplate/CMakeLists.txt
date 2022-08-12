@@ -1,7 +1,7 @@
 # CMakeLists for the Project: OpenGLProjectTemplate.
 
-# Set the minimum CMake Version to 3.20.
-cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+# Set the minimum CMake Version to 3.24.
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 # Set the project name and version.
 project(OpenGLProjectTemplate VERSION 1.0)

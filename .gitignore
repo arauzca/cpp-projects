@@ -1,5 +1,9 @@
 # OS files.
 .DS_Store
 
+# IDE Files.
+**/.vscode
+
 # Build files.
 **/build
+**/build-vscode
