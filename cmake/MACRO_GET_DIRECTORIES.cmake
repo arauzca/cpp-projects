@@ -1,0 +1,13 @@
+# Macro to loop through all demo project directories
+macro(GET_DIRECTORIES retval dirname sourcedirectory)
+  file(GLOB SUBDIR "${sourcedirectory}/${dirname}")
+  set(LIST_OF_DIRS "")
+  foreach(DIR ${SUBDIR})
+    if(IS_DIRECTORY ${DIR})
+      if(EXISTS "${DIR}/CMakeLists.txt" AND NOT EXISTS "${DIR}/ignore.cmake")
+        set(LIST_OF_DIRS ${LIST_OF_DIRS} ${DIR})
+      endif()
+    endif()
+  endforeach()
+  SET(${retval} ${LIST_OF_DIRS})
+endmacro()
