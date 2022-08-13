@@ -89,6 +89,8 @@ if(APPLE)
 endif()
 
 if(BUILD_PROJECT_TESTS)
+  # enable_testing() should be called from the source directory root.
+  # Enables testing for this directory and below.
   enable_testing()
 endif()
 

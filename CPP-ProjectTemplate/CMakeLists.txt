@@ -56,8 +56,6 @@ add_executable(${EXECUTABLE_NAME} ${SRCS} ${HDRS})
 target_link_libraries(${EXECUTABLE_NAME} ${LIBS_RELEASE} ${LIBS_DEBUG})
 
 if(BUILD_PROJECT_TESTS)
-  enable_testing()
-
   # Adding tests if available.
   include(FUNCTION_ADD_TESTS)
   ADD_TESTS("${CMAKE_CURRENT_SOURCE_DIR}/test")
