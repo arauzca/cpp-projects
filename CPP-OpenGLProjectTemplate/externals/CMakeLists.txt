@@ -1,7 +1,7 @@
 # Set the minimum CMake Version to 3.24.
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
-set(ALLOW_DUPLICATE_CUSTOM_TARGETS TRUE)
+set(ALLOW_DUPLICATE_CUSTOM_TARGETS FALSE)
 include(FetchContent)
 
 
@@ -62,6 +62,15 @@ if(NOT GLM_FOUND)
 
   FetchContent_MakeAvailable(glm)
 endif()
+
+
+# ------------------------------------------------------------------------------
+FetchContent_Declare(
+  gl3w
+  GIT_REPOSITORY  https://github.com/skaslev/gl3w.git
+  GIT_TAG         origin/master)
+
+FetchContent_MakeAvailable(gl3w)
 
 
 # ------------------------------------------------------------------------------

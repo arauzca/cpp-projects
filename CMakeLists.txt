@@ -28,7 +28,7 @@ project(CPP_Projects
 
 
 # Specify the C++ standard. --------------------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
@@ -94,9 +94,9 @@ if(BUILD_PROJECT_TESTS)
   enable_testing()
 endif()
 
-# Intergrating extern dependencies.
-message("Intergrating extern dependencies: ${CMAKE_HOME_DIRECTORY}/extern")
-add_subdirectory("${CMAKE_HOME_DIRECTORY}/extern")
+# Intergrating externals dependencies.
+message("Intergrating externals dependencies: ${CMAKE_HOME_DIRECTORY}/externals")
+add_subdirectory("${CMAKE_HOME_DIRECTORY}/externals")
 
 
 # Process found applications.

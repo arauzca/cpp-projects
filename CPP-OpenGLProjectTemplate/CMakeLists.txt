@@ -53,7 +53,6 @@ source_group("glsl" FILES ${GLSL})
 
 find_package(PkgConfig REQUIRED)
 
-# TODO: find packages in a list.
 find_package(ASSIMP)
 if(NOT ASSIMP_FOUND)
   set(ASSIMP_LIBRARIES assimp)
@@ -74,15 +73,13 @@ else()
   set(GLM_LIBRARY glm)
 endif()
 
-# Add external libraries.
-set(EXTERN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern")
-if(IS_DIRECTORY ${EXTERN_DIR})
-  if(EXISTS "${EXTERN_DIR}/CMakeLists.txt" AND NOT EXISTS "${EXTERN_DIR}/ignore.cmake")
-    add_subdirectory(${EXTERN_DIR})
+# Add externals libraries.
+set(EXTERNALS_LIBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/externals")
+if(IS_DIRECTORY ${EXTERNALS_LIBS_DIR})
+  if(EXISTS "${EXTERNALS_LIBS_DIR}/CMakeLists.txt" AND NOT EXISTS "${EXTERNALS_LIBS_DIR}/ignore.cmake")
+    add_subdirectory(${EXTERNALS_LIBS_DIR})
   endif()
 endif()
-
-find_package(GLEW REQUIRED STATIC)
 
 # find framework (specific to mac).
 if (APPLE)
@@ -99,18 +96,17 @@ endif ()
 # Setup package headers.
 include_directories(
   include
+  gl3w
   ${ASSIMP_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  ${OPENGL_INCLUDE_DIR}
-  ${GLEW_INCLUDE_DIRS})
+  ${OPENGL_INCLUDE_DIR})
 
 # Force older GLM versions to use radians instead of degrees.
 add_definitions(-DGLM_FORCE_RADIANS)
 
 # Setup debug/release libraries.
 set(LIBS_DEBUG)
-
 set(LIBS_RELEASE)
 
 # Define target dependencies and build instructions.
@@ -130,9 +126,9 @@ target_link_libraries (${EXECUTABLE_NAME}
   ${OPENGL_INCLUDE_DIR}
   ${ASSIMP_LIBRARIES}
   ${FLTK_LIBRARIES}
-  GLEW::GLEW
+  gl3w
   ${GLFW_LIBRARY}
   ${GLM_LIBRARY}
   ${COCOA_LIBRARY} ${COREVID_LIBRARY} ${IOKIT_LIBRARY})
 
-add_dependencies(${EXECUTABLE_NAME} GLEW::GLEW ${GLFW_LIBRARY} ${GLM_LIBRARY} ${ASSIMP_LIBRARIES})
+add_dependencies(${EXECUTABLE_NAME} gl3w ${GLFW_LIBRARY} ${GLM_LIBRARY} ${ASSIMP_LIBRARIES})
