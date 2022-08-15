@@ -2,11 +2,11 @@
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 include(MACRO_GET_DIRECTORIES)
-GET_DIRECTORIES(SUBDIRS * .)
+get_directories(SUBDIRS * .)
 
 # Process found applications.
 foreach(SUBDIR ${SUBDIRS})
-  if(EXISTS ${SUBDIR})
-    add_subdirectory(${SUBDIR})
-  endif()
+    if(EXISTS ${SUBDIR})
+        add_subdirectory(${SUBDIR})
+    endif()
 endforeach()
