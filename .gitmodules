@@ -1,3 +1,0 @@
-[submodule "CPP-MetalProjectTemplate/externals/cmake-metal-cpp"]
-	path = CPP-MetalProjectTemplate/externals/cmake-metal-cpp
-	url = git@github.com:arauzca/cmake-metal-cpp.git
