@@ -34,10 +34,6 @@ source_group("source" FILES ${SRCS})
 file(GLOB HDRS ./include/*.h ./include/*.hpp)
 source_group("include" FILES ${HDRS})
 
-set(MAKE_METAL_SINGLE_HEADER
-    ON
-    CACHE BOOL "")
-
 # Add externals subdirectory.
 add_subdirectory(externals)
 
