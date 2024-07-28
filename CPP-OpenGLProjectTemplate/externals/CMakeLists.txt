@@ -10,7 +10,7 @@ if(NOT ASSIMP_FOUND)
     FetchContent_Declare(
         assimp
         GIT_REPOSITORY https://github.com/assimp/assimp.git
-        GIT_TAG v5.2.4)
+        GIT_TAG v5.4.2)
 
     set(BUILD_SHARED_LIBS
         OFF
@@ -32,7 +32,19 @@ if(NOT FLTK_FOUND)
     FetchContent_Declare(
         fltk
         GIT_REPOSITORY https://github.com/fltk/fltk.git
-        GIT_TAG release-1.3.8)
+        GIT_TAG release-1.3.9)
+
+    set(OPTION_USE_SYSTEM_LIBPNG
+        OFF
+        CACHE BOOL "" FORCE)
+
+    set(OPTION_USE_SYSTEM_LIBJPEG
+        OFF
+        CACHE BOOL "" FORCE)
+
+    set(FLTK_BUILD_FLUID
+        OFF
+        CACHE BOOL "" FORCE)
 
     set(FLTK_BUILD_TEST
         OFF
@@ -43,11 +55,11 @@ endif()
 
 # A multi-platform library for OpenGL, OpenGL ES, Vulkan, window and input
 # http://www.glfw.org/
-if(NOT glfw3_FOUND)
+if(NOT GLFW3_FOUND)
     FetchContent_Declare(
         glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.3.8)
+        GIT_TAG 3.3.10)
 
     set(GLFW_BUILD_DOCS
         OFF
@@ -66,7 +78,7 @@ if(NOT GLM_FOUND)
     FetchContent_Declare(
         glm
         GIT_REPOSITORY https://github.com/g-truc/glm.git
-        GIT_TAG 0.9.9.8)
+        GIT_TAG 1.0.1)
 
     FetchContent_MakeAvailable(glm)
 endif()

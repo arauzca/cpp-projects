@@ -1,7 +1,7 @@
 # CMakeLists for the Project: cpp-projects. Builds every project that starts with the
 # prefix "CPP-" and each project needs to have its own CMakeLists-file.
 
-cmake_minimum_required(VERSION 3.5...3.24 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5...3.30 FATAL_ERROR)
 
 if(APPLE)
     set(CMAKE_MACOSX_RPATH OFF)
@@ -28,6 +28,7 @@ project(
 # Specify the C++ standard.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_C_COMPILER /usr/bin/gcc)
 
 # Assume Debug builds as default.
 if(NOT CMAKE_BUILD_TYPE)
@@ -37,7 +38,9 @@ endif()
 # Set up the CMake default search paths.
 set(SOURCE_DIR .)
 set(CMAKE_MODULE_PATH_OLD "${CMAKE_MODULE_PATH}")
-set(CMAKE_MODULE_PATH "${CMAKE_HOME_DIRECTORY}/cmake;${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH
+    "${CMAKE_HOME_DIRECTORY}/cmake;${CMAKE_HOME_DIRECTORY}/cmake/Modules;${CMAKE_MODULE_PATH}"
+)
 
 # Macro to force the build directory to be different from the source directory.
 include(MACRO_ENSURE_OUT_OF_SOURCE_BUILD)
@@ -55,14 +58,14 @@ if(APPLE)
     message("Configuring XCode:")
     # Set the fixed min. deployment target platform version in the project settings of
     # XCode (for convenience reasons).
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 15.0)
     message("CMAKE_OSX_DEPLOYMENT_TARGET = ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 
     set(CMAKE_SYSTEM_NAME "macOS")
     message("CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
 
-    set(CMAKE_SYSTEM_PROCESSOR "arm64")
-    message("CMAKE_SYSTEM_PROCESSOR = ${CMAKE_SYSTEM_PROCESSOR}")
+    set(CMAKE_APPLE_SILICON_PROCESSOR "arm64")
+    message("CMAKE_APPLE_SILICON_PROCESSOR = ${CMAKE_APPLE_SILICON_PROCESSOR}")
 
     if(XCODE)
         set(CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "ch.arauz.cpp-projects")
